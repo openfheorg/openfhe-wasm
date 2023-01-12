@@ -69,20 +69,23 @@ EMSCRIPTEN_BINDINGS(core) {
       .value("HEStd_256_classic", HEStd_256_classic)
       .value("HEStd_NotSet", HEStd_NotSet);
 
-  enum_<MODE>("MODE").value("RLWE", RLWE).value("OPTIMIZED", OPTIMIZED).value("SPARSE", SPARSE);
+  enum_<SecretKeyDist>("SecretKeyDist")
+      .value("GAUSSIAN", GAUSSIAN)
+      .value("UNIFORM_TERNARY", UNIFORM_TERNARY)
+      .value("SPARSE_TERNARY", SPARSE_TERNARY);
 
   enum_<PKESchemeFeature>("PKESchemeFeature")
-      .value("ENCRYPTION", ENCRYPTION)
+      .value("PKE", PKE)
       .value("PRE", PRE)
-      .value("SHE", SHE)
+      .value("SHE", LEVELEDSHE)
       .value("FHE", FHE)
-      .value("LEVELEDSHE", LEVELEDSHE)
       .value("MULTIPARTY", MULTIPARTY)
       .value("ADVANCEDSHE", ADVANCEDSHE);
-  enum_<RescalingTechnique>("RescalingTechnique")
-      .value("APPROXRESCALE", APPROXRESCALE)
-      .value("EXACTRESCALE", EXACTRESCALE)
-      .value("APPROXAUTO", APPROXAUTO);
+
+  enum_<ScalingTechnique>("ScalingTechnique")
+      .value("FIXEDMANUAL", FIXEDMANUAL)
+      .value("FLEXIBLEAUTO", FLEXIBLEAUTO)
+      .value("FIXEDAUTO", FIXEDAUTO);
 }
 
 #endif

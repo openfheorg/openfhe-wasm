@@ -9,7 +9,7 @@
 project(openfhe-wasm)
 cmake_minimum_required(VERSION 3.5.1)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 set(CXX_STANDARD_REQUIRED ON)
 
 find_package(OpenFHE REQUIRED)
@@ -52,7 +52,7 @@ add_compile_options("-DOPENFHE_VERSION=${OpenFHE_VERSION}")
 ### add each of the subdirs of src
 add_subdirectory(src/binfhe)
 add_subdirectory(src/core)
-#add_subdirectory(src/pke)
+add_subdirectory(src/pke)
 
 find_package(Doxygen QUIET COMPONENTS dot)
 if (DOXYGEN_FOUND)

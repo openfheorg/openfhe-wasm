@@ -3,10 +3,10 @@
 #include "openfhe.h"
 #include "ciphertext-ser.h"
 #include "cryptocontext-ser.h"
-#include "pubkeylp-ser.h"
+#include "key/key-ser.h"
 #include "scheme/bgvrns/bgvrns-ser.h"
 #include "scheme/bfvrns/bfvrns-ser.h"
-#include "scheme/ckks/ckks-ser.h"
+#include "scheme/ckksrns/ckksrns-ser.h"
 using namespace lbcrypto;
 
 // Emscripten includes.
@@ -147,7 +147,7 @@ CryptoContext<Element> GenCryptoContextBGVrns(usint multiplicativeDepth,
  * @param ringDim (default) - the ring dimension (if not specified selected automatically
  * based on stdLevel).
  * @param ksTech (default) - key switching technique to use (e.g., HYBRID, GHS or BV).
- * @param rsTech (default) - rescaling technique to use (e.g., APPROXRESCALE or
+ * @param rsTech (default) - Scaling technique to use (e.g., APPROXRESCALE or
  * EXACTRESCALE).
  * @param numLargeDigits (default) - the number of big digits to use in HYBRID key
  * switching.
@@ -857,7 +857,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
   emscripten::function("GenCryptoContextCKKS", &GenCryptoContextCKKS<DCRTPoly>);
   emscripten::function(
       "GenCryptoContextCKKS",
-      select_overload<CryptoContext<DCRTPoly>(usint, usint, usint, SecurityLevel, usint, RescalingTechnique,
+      select_overload<CryptoContext<DCRTPoly>(usint, usint, usint, SecurityLevel, usint, ScalingTechnique,
                                               KeySwitchTechnique, uint32_t, int, usint, usint, MODE)>(
           &CryptoContextFactory<DCRTPoly>::genCryptoContextCKKS));
 
