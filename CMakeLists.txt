@@ -12,9 +12,11 @@ cmake_minimum_required(VERSION 3.5.1)
 set(CMAKE_CXX_STANDARD 11)
 set(CXX_STANDARD_REQUIRED ON)
 
-
 find_package(OpenFHE REQUIRED)
 include_directories(${OpenFHE_INCLUDE})
+include_directories(${OpenFHE_INCLUDE}/third-party/include)
+include_directories(${OpenFHE_INCLUDE}/core)
+include_directories(${OpenFHE_INCLUDE}/pke)
 link_directories(${OpenFHE_LIBDIR})
 link_libraries(${OpenFHE_LIBRARIES})
 
