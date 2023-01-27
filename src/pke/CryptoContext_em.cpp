@@ -1,5 +1,6 @@
 
 // OpenFHE Includes
+#include "math/hal.h"
 #include "openfhe.h"
 #include "ciphertext-ser.h"
 #include "cryptocontext-ser.h"
@@ -95,7 +96,7 @@ CryptoContext<Element> GenCryptoContextBFVrns2(uint32_t batchSize,
       modDecompBitLen, primeModBitLen, ringDimension);
 
   cc->Enable(ENCRYPTION);
-  cc->Enable(SHE);
+  cc->Enable(LEVELEDSHE);
   cc->Enable(MULTIPARTY);
   return cc;
 }
@@ -188,7 +189,7 @@ void Enable(const CryptoContext<Element> cryptoCtx, PKESchemeFeature pkeScheme) 
  * @return a public/secret key pair.
  */
 template <typename Element>
-LPKeyPair<Element> KeyGen(CryptoContext<Element> cryptoCtx) {
+KeyPair<Element> KeyGen(CryptoContext<Element> cryptoCtx) {
   return cryptoCtx->KeyGen();
 }
 
@@ -199,7 +200,7 @@ LPKeyPair<Element> KeyGen(CryptoContext<Element> cryptoCtx) {
  * ciphertext.
  */
 template <typename Element>
-void EvalMultKeyGen(const CryptoContext<Element> cryptoCtx, LPPrivateKey<Element> secretKey) {
+void EvalMultKeyGen(const CryptoContext<Element> cryptoCtx, PrivateKey<Element> secretKey) {
   cryptoCtx->EvalMultKeyGen(secretKey);
 }
 
@@ -243,7 +244,7 @@ Plaintext MakeCKKSPackedPlaintext(const CryptoContext<Element> cryptoCtx, std::v
  */
 template <typename Element>
 Ciphertext<Element> Encrypt(const CryptoContext<Element> cryptoCtx,
-                            LPPublicKey<Element> publicKey,
+                            PublicKey<Element> publicKey,
                             Plaintext plaintext) {
   return cryptoCtx->Encrypt(publicKey, plaintext);
 }
@@ -257,7 +258,7 @@ Ciphertext<Element> Encrypt(const CryptoContext<Element> cryptoCtx,
  */
 template <typename Element>
 Plaintext Decrypt(const CryptoContext<Element> cryptoCtx,
-                  const LPPrivateKey<Element> secretKey,
+                  const PrivateKey<Element> secretKey,
                   Ciphertext<Element> ciphertext) {
   Plaintext result;
   cryptoCtx->Decrypt(secretKey, ciphertext, &result);
@@ -469,7 +470,7 @@ Ciphertext<Element> EvalLinearWSum(const CryptoContext<Element> &cryptoCtx,
  * (digit decomposition).
  */
 template <typename Element>
-std::shared_ptr<vector<Element>> EvalFastRotationPrecompute(const CryptoContext<Element> &cryptoCtx,
+std::shared_ptr<std::vector<Element>> EvalFastRotationPrecompute(const CryptoContext<Element> &cryptoCtx,
                                                             Ciphertext<Element> ciphertext) {
   return cryptoCtx->EvalFastRotationPrecompute(ciphertext);
 }
@@ -506,7 +507,7 @@ Ciphertext<Element> EvalFastRotation(const CryptoContext<Element> &cryptoCtx,
  */
 template <typename Element>
 Ciphertext<Element> ReEncrypt2(const CryptoContext<Element> &cryptoCtx,
-                               LPEvalKey<Element> evalKey,
+                               EvalKey<Element> evalKey,
                                Ciphertext<Element> ciphertext) {
   return cryptoCtx->ReEncrypt(evalKey, ciphertext);
 }
@@ -549,7 +550,7 @@ void ClearEvalSumKeys(const CryptoContext<Element> &cryptoCtx) {
  */
 template <typename Element>
 void InsertEvalSumKey(const CryptoContext<Element> &cryptoCtx,
-                      const std::shared_ptr<std::map<usint, LPEvalKey<Element>>> mapToInsert) {
+                      const std::shared_ptr<std::map<usint, EvalKey<Element>>> mapToInsert) {
   cryptoCtx->InsertEvalSumKey(mapToInsert);
 }
 
@@ -561,7 +562,7 @@ void InsertEvalSumKey(const CryptoContext<Element> &cryptoCtx,
  */
 template <typename Element>
 void InsertEvalMultKey(const CryptoContext<Element> &cryptoCtx, const emscripten::val &evalKeyVector) {
-  const auto vectorToInsert = vecFromJSArray<LPEvalKey<Element>>(evalKeyVector);
+  const auto vectorToInsert = vecFromJSArray<EvalKey<Element>>(evalKeyVector);
   cryptoCtx->InsertEvalMultKey(vectorToInsert);
 }
 
@@ -704,7 +705,7 @@ void DeserializeEvalSumKeyFromBuffer(const CryptoContext<Element> &cryptoCtx,
  */
 template <typename Element>
 void EvalAtIndexKeyGen(const CryptoContext<Element> &cryptoCtx,
-                       const LPPrivateKey<Element> privateKey,
+                       const PrivateKey<Element> privateKey,
                        const emscripten::val indexList) {
   auto indexVec = vecFromJSArray<int32_t>(indexList);
   cryptoCtx->EvalAtIndexKeyGen(privateKey, indexVec);
@@ -718,7 +719,7 @@ void EvalAtIndexKeyGen(const CryptoContext<Element> &cryptoCtx,
  * @param publicKey public key (used in NTRU schemes).
  */
 template <typename Element>
-void EvalSumKeyGen1(const CryptoContext<Element> &cryptoCtx, const LPPrivateKey<Element> privateKey) {
+void EvalSumKeyGen1(const CryptoContext<Element> &cryptoCtx, const PrivateKey<Element> privateKey) {
   cryptoCtx->EvalSumKeyGen(privateKey);
 }
 
@@ -737,7 +738,7 @@ void EvalSumKeyGen1(const CryptoContext<Element> &cryptoCtx, const LPPrivateKey<
  * joined public key
  */
 template <typename Element>
-LPKeyPair<Element> MultipartyKeyGen(const CryptoContext<Element> &cryptoCtx, const LPPublicKey<Element> pk) {
+KeyPair<Element> MultipartyKeyGen(const CryptoContext<Element> &cryptoCtx, const PublicKey<Element> pk) {
   return cryptoCtx->MultipartyKeyGen(pk);
 }
 // custom wrapper methods for convenience.
@@ -759,7 +760,7 @@ LPKeyPair<Element> MultipartyKeyGen(const CryptoContext<Element> &cryptoCtx, con
  */
 template <typename Element>
 std::vector<Ciphertext<Element>> MultipartyDecryptLead(const CryptoContext<Element> &cryptoCtx,
-                                                       const LPPrivateKey<Element> privateKey,
+                                                       const PrivateKey<Element> privateKey,
                                                        const emscripten::val &ciphertextVecJs) {
   const auto ciphertextVec = vecFromJSArray<Ciphertext<Element>>(ciphertextVecJs);
   return cryptoCtx->MultipartyDecryptLead(privateKey, ciphertextVec);
@@ -775,7 +776,7 @@ std::vector<Ciphertext<Element>> MultipartyDecryptLead(const CryptoContext<Eleme
  */
 template <typename Element>
 std::vector<Ciphertext<Element>> MultipartyDecryptMain(const CryptoContext<Element> &cryptoCtx,
-                                                       const LPPrivateKey<Element> privateKey,
+                                                       const PrivateKey<Element> privateKey,
                                                        const emscripten::val &ciphertextVecJs) {
   const auto ciphertext = vecFromJSArray<Ciphertext<Element>>(ciphertextVecJs);
   return cryptoCtx->MultipartyDecryptMain(privateKey, ciphertext);
@@ -810,9 +811,9 @@ Plaintext MultipartyDecryptFusion(const CryptoContext<Element> &cryptoCtx,
  * @return the EvalSum key map.
  */
 template <typename Element>
-std::shared_ptr<std::map<usint, LPEvalKey<Element>>> GetEvalSumKeyMap(const CryptoContext<Element> &cryptoCtx,
+std::shared_ptr<std::map<usint, EvalKey<Element>>> GetEvalSumKeyMap(const CryptoContext<Element> &cryptoCtx,
                                                                       const std::string &keyId) {
-  return std::make_shared<std::map<usint, LPEvalKey<Element>>>(cryptoCtx->GetEvalSumKeyMap(keyId));
+  return std::make_shared<std::map<usint, EvalKey<Element>>>(cryptoCtx->GetEvalSumKeyMap(keyId));
 }
 
 /**
@@ -862,12 +863,12 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
           &CryptoContextFactory<DCRTPoly>::genCryptoContextCKKS));
 
   emscripten::register_vector<Ciphertext<DCRTPoly>>("VectorCiphertextDCRTPoly");
-  emscripten::register_vector<LPEvalKey<DCRTPoly>>("VectorLPEvalKeyDCRTPoly");
+  emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");
   emscripten::register_vector<DCRTPoly>("VectorDCRTPoly")
       .smart_ptr<std::shared_ptr<std::vector<DCRTPoly>>>("VectorDCRTPoly");
 
-  emscripten::register_map<usint, LPEvalKey<DCRTPoly>>("UnsignedIntToLPEvalKey_DCRTPolyMap")
-      .smart_ptr<std::shared_ptr<std::map<usint, LPEvalKey<DCRTPoly>>>>("UnsignedIntToLPEvalKey_DCRTPolyMap");
+  emscripten::register_map<usint, EvalKey<DCRTPoly>>("UnsignedIntToEvalKey_DCRTPolyMap")
+      .smart_ptr<std::shared_ptr<std::map<usint, EvalKey<DCRTPoly>>>>("UnsignedIntToEvalKey_DCRTPolyMap");
 
   class_<CryptoContextImpl<DCRTPoly>>("CryptoContext_DCRTPoly")
       .smart_ptr<CryptoContext<DCRTPoly>>("CryptoContext_DCRTPoly")
@@ -877,7 +878,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .function("KeyGen", &CC::KeyGen)
       // select_overload() required because the other overload is deprecated
       .function("ReKeyGen",
-                select_overload<LPEvalKey<DCRTPoly>(const LPPublicKey<DCRTPoly>, const LPPrivateKey<DCRTPoly>) const>(
+                select_overload<EvalKey<DCRTPoly>(const PublicKey<DCRTPoly>, const PrivateKey<DCRTPoly>) const>(
                     &CC::ReKeyGen))
       .function("MultipartyKeyGen", &MultipartyKeyGen<DCRTPoly>)
       .function("KeySwitchGen", &CC::KeySwitchGen)
@@ -902,7 +903,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .function("MakePackedPlaintext", &CC::MakePackedPlaintext)
       .function("MakeCKKSPackedPlaintext", &MakeCKKSPackedPlaintext<DCRTPoly>)
       // select_overload() required because the other overload is deprecated
-      .function("Encrypt", select_overload<Ciphertext<DCRTPoly>(LPPublicKey<DCRTPoly>, Plaintext)>(&CC::Encrypt))
+      .function("Encrypt", select_overload<Ciphertext<DCRTPoly>(PublicKey<DCRTPoly>, Plaintext)>(&CC::Encrypt))
       .function("ReEncrypt", &ReEncrypt2<DCRTPoly>)
       .function("Decrypt", &Decrypt<DCRTPoly>, allow_raw_pointers())
       .function("EvalAddCipherCipher", EvalAddCipherCipher<DCRTPoly>)

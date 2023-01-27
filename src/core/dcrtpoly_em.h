@@ -30,7 +30,7 @@ typename Element::Integer GetModulus(const typename Element::Params &params) {
 
 EMSCRIPTEN_BINDINGS(DCRTPoly) {
   class_<DCRTPoly::Params>("ElementParams")
-      .smart_ptr<shared_ptr<DCRTPoly::Params>>("ElementParams")
+      .smart_ptr<std::shared_ptr<DCRTPoly::Params>>("ElementParams")
       .function("GetCyclotomicOrder", &GetCyclotomicOrder<DCRTPoly>)
       .function("GetModulus", &GetModulus<DCRTPoly>)
       .function("toString", &GetString<DCRTPoly::Params>);
