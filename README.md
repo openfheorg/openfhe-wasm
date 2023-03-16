@@ -57,7 +57,7 @@ to install the binaries in the desired location.
 ```
 mkdir build
 cd build
-emcmake cmake .. -DPalisade_DIR=${PREFIX}/lib/OpenFHE
+emcmake cmake .. -DOpenFHE_DIR=${PREFIX}/lib/OpenFHE
 emmake make
 ```
 

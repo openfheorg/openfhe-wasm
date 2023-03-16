@@ -5,7 +5,6 @@
 ## as it generates the Makefile
 ##
 
-
 project(openfhe-wasm)
 cmake_minimum_required(VERSION 3.5.1)
 
@@ -28,6 +27,8 @@ if (OpenFHE_FOUND)
     message(STATUS "OpenFHE Library Directories: ${OpenFHE_LIBDIR}")
     message(STATUS "OpenFHE installed as shared libraries: ${OpenFHE_SHARED}")
     message(STATUS "OpenFHE Native Backend size: ${OpenFHE_NATIVE_SIZE}")
+else()
+    message( FATAL_ERROR "Could not find OpenFHE. Exiting." )
 endif ()
 
 set(NATIVE_SIZE ${OPENFHE_NATIVE_SIZE})
@@ -54,16 +55,15 @@ add_subdirectory(src/binfhe)
 add_subdirectory(src/core)
 add_subdirectory(src/pke)
 
-find_package(Doxygen QUIET COMPONENTS dot)
-if (DOXYGEN_FOUND)
-
-    add_custom_target(apidocs
-            COMMAND sh -c "( cat ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen-config && echo PROJECT_NUMBER=${OPENFHE_VERSION} ) | ${DOXYGEN_EXECUTABLE} -"
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            COMMENT "Generating API documentation with Doxygen"
-            VERBATIM)
-    message(STATUS "Doxygen and dot are found")
-
-else (DOXYGEN_FOUND)
-    message(STATUS "Doxygen and dot (from graphviz) need to be installed to generate the doxygen documentation")
-endif (DOXYGEN_FOUND)
+#find_package(Doxygen QUIET COMPONENTS dot)
+#if (DOXYGEN_FOUND)
+#
+#    add_custom_target(apidocs
+#            COMMAND sh -c "( cat ${CMAKE_CURRENT_SOURCE_DIR}/doc/doxygen-config && echo PROJECT_NUMBER=${OPENFHE_VERSION} ) | ${DOXYGEN_EXECUTABLE} -"
+#            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+#            COMMENT "Generating API documentation with Doxygen"
+#            VERBATIM)
+#    message(STATUS "Doxygen and dot are found")
+#else (DOXYGEN_FOUND)
+#    message(STATUS "Doxygen and dot (from graphviz) need to be installed to generate the doxygen documentation")
+#endif (DOXYGEN_FOUND)

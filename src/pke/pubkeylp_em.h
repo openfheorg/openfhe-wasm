@@ -9,7 +9,7 @@
  * @return The plaintext modulus.
  */
 template <typename Element>
-uint32_t GetWrappedPlaintextModulus(const CryptoParameters<Element> &CryptoParameters) {
+uint32_t GetWrappedPlaintextModulus(const CCParams<Element> &CryptoParameters) {
   // assume that the plaintext modulus is < 2^31
   return (uint32_t)CryptoParameters.GetPlaintextModulus();
 }
@@ -37,12 +37,12 @@ EMSCRIPTEN_BINDINGS(pke_publey) {
       .smart_ptr<ConstCiphertext<DCRTPoly>>("ConstCiphertext_DCRTPoly")
       .function("GetEncodingType", &GetEncodingType<DCRTPoly>)
       .function("toString", &GetString<CiphertextImpl<DCRTPoly>>);
-  class_<CryptoParameters<DCRTPoly>>("CryptoParameters_DCRTPoly")
-      .smart_ptr<std::shared_ptr<CryptoParameters<DCRTPoly>>>("CryptoParameters_DCRTPoly")
-      .function("GetElementParams", &CryptoParameters<DCRTPoly>::GetElementParams)
+  class_<CCParams<DCRTPoly>>("CryptoParameters_DCRTPoly")
+      .smart_ptr<std::shared_ptr<CCParams<DCRTPoly>>>("CryptoParameters_DCRTPoly")
+      .function("GetElementParams", &CCParams<DCRTPoly>::GetElementParams)
       .function("GetPlaintextModulus", &GetWrappedPlaintextModulus<DCRTPoly>)
-      .function("GetRelinWindow", &CryptoParameters<DCRTPoly>::GetRelinWindow)
-      .function("toString", &GetString<CryptoParameters<DCRTPoly>>);
+      .function("GetRelinWindow", &CCParams<DCRTPoly>::GetRelinWindow)
+      .function("toString", &GetString<CCParams<DCRTPoly>>);
   class_<KeyPair<DCRTPoly>>("KeyPair_DCRTPoly")
       .function("good", &KeyPair<DCRTPoly>::good)
       .property("secretKey", &KeyPair<DCRTPoly>::secretKey)

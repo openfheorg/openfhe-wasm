@@ -2,7 +2,6 @@
 #define _OPENFHEWEB_PKE_SERIAL_EM_H
 
 #include "core/serial_em.h"
-#include
 
 using namespace lbcrypto;
 
