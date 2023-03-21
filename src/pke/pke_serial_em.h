@@ -30,7 +30,7 @@ CryptoContext<Element> DeserializeCryptoContextFromBuffer(const emscripten::val 
     return nullptr;
   }
 
-  auto getCC = CryptoContextFactory<Element>::GetContext(cc->GetCryptoParameters(), cc->GetEncryptionAlgorithm(),
+  auto getCC = CryptoContextFactory<Element>::GetContext(cc->GetCryptoParameters(), cc->GetScheme(),
                                                          cc->getSchemeId());
 
   return getCC;

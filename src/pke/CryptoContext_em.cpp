@@ -27,149 +27,126 @@ using namespace emscripten;
 #include "core/backend_em.h"
 #include "core/clear_context.h"
 
-/**
- * @brief construct a OPENFHE CryptoContextImpl for the BFVrns Scheme using the
- * scheme's ParamsGen methods.
- * @param plaintextModulus plaintext modulus.
- * @param securityLevel root Hermite factor (lattice security parameter).
- * @param sigma StdDev - distribution parameter for Gaussian noise generation.
- * @param numAdds additive depth for homomorphic computations (assumes
- * numMults and numKeySwitches are set to zero).
- * @param depth numMults - multiplicative depth for homomorphic computations (assumes
- * numAdds and numKeySwitches are set to zero).
- * @param numKeyswitches  key-switching depth for homomorphic computations
- * (assumes numAdds and numMults are set to zero).
- * @param mode secret key distribution mode (RLWE [Gaussian noise] or
- * OPTIMIZED [ternary uniform distribution]).
- * @param maxDepth (default) - the maximum power of secret key for which the
- * relinearization key is generated (by default, it is 2); setting it to a
- * value larger than 2 adds support for homomorphic multiplication w/o
- * relinearization.
- * @param relinWindow (default) - the key switching window (bits in the base for digits)
- * used for digit decomposition (0 - means to use only CRT decomposition).
- * @param dcrtBits (default) - size of "small" CRT moduli.
- * @param n (default) - ring dimension in case the user wants to use a custom ring
- * dimension.
- * @return new context.
- */
-template <typename Element>
-CryptoContext<Element> GenCryptoContextBFVrns(uint32_t plaintextModulus,
-                                              SecurityLevel securityLevel,
-                                              double sigma,
-                                              uint32_t numAdd,
-                                              uint32_t depth,
-                                              uint32_t numKeyswitches,
-                                              MODE mode) {
-  return CryptoContextFactory<Element>::genCryptoContextBFVrns(plaintextModulus, securityLevel, sigma, numAdd, depth,
-                                                               numKeyswitches, mode);
-}
-
-/**
- * Generate
- * @param batchSize
- * @param plaintextModulus
- * @param securityLevel
- * @param dist
- * @param multDepth
- * @param mode
- * @param maxDepthPreRelin
- * @param modDecompBitLen
- * @param primeModBitLen
- * @param ringDimension
- *
- */
-template <typename Element>
-CryptoContext<Element> GenCryptoContextBFVrns2(uint32_t batchSize,
-                         uint32_t plaintextModulus,
-                         SecurityLevel securityLevel,
-                         float dist,
-                         unsigned int multDepth,
-                         MODE mode,
-                         int maxDepthPreRelin,
-                         uint32_t modDecompBitLen,
-                         size_t primeModBitLen,
-                         uint32_t ringDimension) {
-  EncodingParams encodingParams(new EncodingParamsImpl(plaintextModulus, batchSize));
-
-  CryptoContext<Element> cc = CryptoContextFactory<Element>::genCryptoContextBFVrns(
-      encodingParams, SecurityLevel(securityLevel), dist, 0, multDepth, 0, MODE(mode), maxDepthPreRelin,
-      modDecompBitLen, primeModBitLen, ringDimension);
-
-  cc->Enable(ENCRYPTION);
-  cc->Enable(LEVELEDSHE);
-  cc->Enable(MULTIPARTY);
-  return cc;
-}
-
-/**
- * @brief Construct a OPENFHE CryptoContextImpl for the BGVrns Scheme.
- *
- * @param multiplicativeDepth the depth of multiplications supported by the
- * scheme (equal to number of towers - 1).
- * @param plaintextModulus the plaintext modulus.
- * @param securityLevel the standard security level we want the scheme to satisfy.
- * @param sigma StdDev - distribution parameter for error distribution.
- * @param maxDepth the maximum power of secret key for which the
- * relinearization key is generated.
- * @param mode RLWE (gaussian distribution) or OPTIMIZED (ternary distribution).
- * @param keySwitchTechnique (default) - key switching technique to use (e.g., HYBRID, GHS or BV).
- * @param ringDim (default) - the ring dimension (if not specified selected automatically
- * based on stdLevel).
- * @param numLargeDigits (default) - the number of big digits to use in HYBRID key
- * switching.
- * @param firstModSize (default) - the bit-length of the first modulus.
- * @param dcrtrBits (default) - the size of the moduli in bits.
- * @param relinWindow (default) - the relinearization windows (used in BV key switching,
- * use 0 for RNS decomposition).
- * @param batchSize (default) - the number of slots being used in the ciphertext.
- * @param msMethod (default) - mod switch method.
- * @return new context
- */
-template <typename Element>
-CryptoContext<Element> GenCryptoContextBGVrns(usint multiplicativeDepth,
-                                              usint plaintextModulus,
-                                              SecurityLevel securityLevel,
-                                              double sigma,
-                                              uint32_t maxDepth,
-                                              MODE mode,
-                                              KeySwitchTechnique keySwitchTechnique) {
-  return CryptoContextFactory<Element>::genCryptoContextBGVrns(multiplicativeDepth, plaintextModulus, securityLevel,
-                                                               sigma, maxDepth, mode, keySwitchTechnique);
-}
-
-/**
- * @brief Construct a OPENFHE CryptoContextImpl for the CKKS Scheme.
- *
- * @param multiplicativeDepth the depth of multiplications supported by the
- * scheme (equal to number of towers - 1).
- * @param scalingFactorBits the size of the scaling factor in bits.
- * @param batchSize the number of slots being used in the ciphertext.
- * @param securityLevel the standard security level we want the scheme to satisfy.
- * @param ringDim (default) - the ring dimension (if not specified selected automatically
- * based on stdLevel).
- * @param ksTech (default) - key switching technique to use (e.g., HYBRID, GHS or BV).
- * @param rsTech (default) - Scaling technique to use (e.g., APPROXRESCALE or
- * EXACTRESCALE).
- * @param numLargeDigits (default) - the number of big digits to use in HYBRID key
- * switching.
- * @param maxDepth (default) - the maximum power of secret key for which the
- * relinearization key is generated.
- * @param firstModSize (default) - the bit-length of the first modulus.
- * @param relinWindow (default) - the relinearization windows (used in BV key switching,
- * use 0 for RNS decomposition).
- * @param mode (default) - RLWE (gaussian distribution) or OPTIMIZED (ternary
- * distribution).
- * @return new context.
- */
-template <typename Element>
-CryptoContext<Element> GenCryptoContextCKKS(usint multiplicativeDepth,
-                                            usint scaleFactorBits,
-                                            usint batchSize,
-                                            SecurityLevel securityLevel) {
-  return CryptoContextFactory<Element>::genCryptoContextCKKS(multiplicativeDepth, scaleFactorBits, batchSize,
-                                                             securityLevel);
-}
-
+//
+//template <typename Element>
+//CryptoContext<Element> GetCryptoContext()
+//CryptoContext<Element> GenCryptoContextBFVrns(uint32_t plaintextModulus,
+//                                              SecurityLevel securityLevel,
+//                                              double sigma,
+//                                              uint32_t numAdd,
+//                                              uint32_t depth,
+//                                              uint32_t numKeyswitches,
+//                                              SecretKeyDist skDist) {
+//  return CryptoContextFactory<Element>::genCryptoContextBFVrns(plaintextModulus, securityLevel, sigma, numAdd, depth,
+//                                                               numKeyswitches, skDist);
+//}
+//
+///**
+// * Generate
+// * @param batchSize
+// * @param plaintextModulus
+// * @param securityLevel
+// * @param dist
+// * @param multDepth
+// * @param skDist
+// * @param maxDepthPreRelin
+// * @param modDecompBitLen
+// * @param primeModBitLen
+// * @param ringDimension
+// *
+// */
+//template <typename Element>
+//CryptoContext<Element> GenCryptoContextBFVrns2(uint32_t batchSize,
+//                         uint32_t plaintextModulus,
+//                         SecurityLevel securityLevel,
+//                         float dist,
+//                         unsigned int multDepth,
+//                         SecretKeyDist skDist,
+//                         int maxDepthPreRelin,
+//                         uint32_t modDecompBitLen,
+//                         size_t primeModBitLen,
+//                         uint32_t ringDimension) {
+//  EncodingParams encodingParams(new EncodingParamsImpl(plaintextModulus, batchSize));
+//
+//  CryptoContext<Element> cc = CryptoContextFactory<Element>::genCryptoContextBFVrns(
+//      encodingParams, SecurityLevel(securityLevel), dist, 0, multDepth, 0, SecretKeyDist(skDist), maxDepthPreRelin,
+//      modDecompBitLen, primeModBitLen, ringDimension);
+//
+//  cc->Enable(PKE);
+//  cc->Enable(LEVELEDSHE);
+//  cc->Enable(MULTIPARTY);
+//  return cc;
+//}
+//
+///**
+// * @brief Construct a OPENFHE CryptoContextImpl for the BGVrns Scheme.
+// *
+// * @param multiplicativeDepth the depth of multiplications supported by the
+// * scheme (equal to number of towers - 1).
+// * @param plaintextModulus the plaintext modulus.
+// * @param securityLevel the standard security level we want the scheme to satisfy.
+// * @param sigma StdDev - distribution parameter for error distribution.
+// * @param maxDepth the maximum power of secret key for which the
+// * relinearization key is generated.
+// * @param skDist RLWE (gaussian distribution) or OPTIMIZED (ternary distribution).
+// * @param keySwitchTechnique (default) - key switching technique to use (e.g., HYBRID, GHS or BV).
+// * @param ringDim (default) - the ring dimension (if not specified selected automatically
+// * based on stdLevel).
+// * @param numLargeDigits (default) - the number of big digits to use in HYBRID key
+// * switching.
+// * @param firstModSize (default) - the bit-length of the first modulus.
+// * @param dcrtrBits (default) - the size of the moduli in bits.
+// * @param relinWindow (default) - the relinearization windows (used in BV key switching,
+// * use 0 for RNS decomposition).
+// * @param batchSize (default) - the number of slots being used in the ciphertext.
+// * @param msMethod (default) - mod switch method.
+// * @return new context
+// */
+//template <typename Element>
+//CryptoContext<Element> GenCryptoContextBGVrns(usint multiplicativeDepth,
+//                                              usint plaintextModulus,
+//                                              SecurityLevel securityLevel,
+//                                              double sigma,
+//                                              uint32_t maxDepth,
+//                                              SecretKeyDist skDist,
+//                                              KeySwitchTechnique keySwitchTechnique) {
+//  return CryptoContextFactory<Element>::genCryptoContextBGVrns(multiplicativeDepth, plaintextModulus, securityLevel,
+//                                                               sigma, maxDepth, skDist, keySwitchTechnique);
+//}
+//
+///**
+// * @brief Construct a OPENFHE CryptoContextImpl for the CKKS Scheme.
+// *
+// * @param multiplicativeDepth the depth of multiplications supported by the
+// * scheme (equal to number of towers - 1).
+// * @param scalingFactorBits the size of the scaling factor in bits.
+// * @param batchSize the number of slots being used in the ciphertext.
+// * @param securityLevel the standard security level we want the scheme to satisfy.
+// * @param ringDim (default) - the ring dimension (if not specified selected automatically
+// * based on stdLevel).
+// * @param ksTech (default) - key switching technique to use (e.g., HYBRID, GHS or BV).
+// * @param rsTech (default) - Scaling technique to use (e.g., APPROXRESCALE or
+// * EXACTRESCALE).
+// * @param numLargeDigits (default) - the number of big digits to use in HYBRID key
+// * switching.
+// * @param maxDepth (default) - the maximum power of secret key for which the
+// * relinearization key is generated.
+// * @param firstModSize (default) - the bit-length of the first modulus.
+// * @param relinWindow (default) - the relinearization windows (used in BV key switching,
+// * use 0 for RNS decomposition).
+// * @param skDist (default) - RLWE (gaussian distribution) or OPTIMIZED (ternary
+// * distribution).
+// * @return new context.
+// */
+//template <typename Element>
+//CryptoContext<Element> GenCryptoContextCKKS(usint multiplicativeDepth,
+//                                            usint scaleFactorBits,
+//                                            usint batchSize,
+//                                            SecurityLevel securityLevel) {
+//  return CryptoContextFactory<Element>::genCryptoContextCKKS(multiplicativeDepth, scaleFactorBits, batchSize,
+//                                                             securityLevel);
+//}
+//
 
 
 // TURN FEATURES ON
@@ -851,7 +828,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
   emscripten::function("GenCryptoContextBFVrns", &GenCryptoContextBFVrns<DCRTPoly>);
   emscripten::function(
       "GenCryptoContextBFVrns",
-      select_overload<CryptoContext<DCRTPoly>(uint32_t, uint32_t, SecurityLevel, float, unsigned int, MODE, int, uint32_t, size_t, uint32_t)>(
+      select_overload<CryptoContext<DCRTPoly>(uint32_t, uint32_t, SecurityLevel, float, unsigned int, SecretKeyDist, int, uint32_t, size_t, uint32_t)>(
           &GenCryptoContextBFVrns2<DCRTPoly>));
 
   emscripten::function("GenCryptoContextBGVrns", &GenCryptoContextBGVrns<DCRTPoly>);
@@ -859,7 +836,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
   emscripten::function(
       "GenCryptoContextCKKS",
       select_overload<CryptoContext<DCRTPoly>(usint, usint, usint, SecurityLevel, usint, ScalingTechnique,
-                                              KeySwitchTechnique, uint32_t, int, usint, usint, MODE)>(
+                                              KeySwitchTechnique, uint32_t, int, usint, usint, SecretKeyDist)>(
           &CryptoContextFactory<DCRTPoly>::genCryptoContextCKKS));
 
   emscripten::register_vector<Ciphertext<DCRTPoly>>("VectorCiphertextDCRTPoly");

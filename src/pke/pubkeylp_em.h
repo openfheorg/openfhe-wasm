@@ -2,6 +2,7 @@
 #define _OPENFHEWEB_PKE_PUBKEYLP_EM_H
 
 #include "core/wrapped.h"
+#include "openfhe.h"
 
 /**
  * @brief Getter for the plaintext modulus.
