@@ -25,150 +25,6 @@ using namespace emscripten;
 #include "core/backend_em.h"
 #include "core/clear_context.h"
 
-/**
- * @brief construct a PALISADE CryptoContextImpl for the BFVrns Scheme using the
- * scheme's ParamsGen methods.
- * @param plaintextModulus plaintext modulus.
- * @param securityLevel root Hermite factor (lattice security parameter).
- * @param sigma StdDev - distribution parameter for Gaussian noise generation.
- * @param numAdds additive depth for homomorphic computations (assumes
- * numMults and numKeySwitches are set to zero).
- * @param depth numMults - multiplicative depth for homomorphic computations (assumes
- * numAdds and numKeySwitches are set to zero).
- * @param numKeyswitches  key-switching depth for homomorphic computations
- * (assumes numAdds and numMults are set to zero).
- * @param mode secret key distribution mode (RLWE [Gaussian noise] or
- * OPTIMIZED [ternary uniform distribution]).
- * @param maxDepth (default) - the maximum power of secret key for which the
- * relinearization key is generated (by default, it is 2); setting it to a
- * value larger than 2 adds support for homomorphic multiplication w/o
- * relinearization.
- * @param relinWindow (default) - the key switching window (bits in the base for digits)
- * used for digit decomposition (0 - means to use only CRT decomposition).
- * @param dcrtBits (default) - size of "small" CRT moduli.
- * @param n (default) - ring dimension in case the user wants to use a custom ring
- * dimension.
- * @return new context.
- */
-template<typename Element>
-CryptoContext<Element> GenCryptoContextBFVrns(uint32_t plaintextModulus,
-                                              SecurityLevel securityLevel,
-                                              double sigma,
-                                              uint32_t numAdd,
-                                              uint32_t depth,
-                                              uint32_t numKeyswitches,
-                                              MODE mode) {
-  return CryptoContextFactory<Element>::genCryptoContextBFVrns(plaintextModulus, securityLevel, sigma, numAdd, depth,
-                                                               numKeyswitches, mode);
-}
-
-/**
- * Generate
- * @param batchSize
- * @param plaintextModulus
- * @param securityLevel
- * @param dist
- * @param multDepth
- * @param mode
- * @param maxDepthPreRelin
- * @param modDecompBitLen
- * @param primeModBitLen
- * @param ringDimension
- *
- */
-template<typename Element>
-CryptoContext<Element> GenCryptoContextBFVrns2(uint32_t batchSize,
-                                               uint32_t plaintextModulus,
-                                               SecurityLevel securityLevel,
-                                               float dist,
-                                               unsigned int multDepth,
-                                               MODE mode,
-                                               int maxDepthPreRelin,
-                                               uint32_t modDecompBitLen,
-                                               size_t primeModBitLen,
-                                               uint32_t ringDimension) {
-  EncodingParams encodingParams(new EncodingParamsImpl(plaintextModulus, batchSize));
-
-  CryptoContext<Element> cc = CryptoContextFactory<Element>::genCryptoContextBFVrns(
-      encodingParams, SecurityLevel(securityLevel), dist, 0, multDepth, 0, MODE(mode), maxDepthPreRelin,
-      modDecompBitLen, primeModBitLen, ringDimension);
-
-  cc->Enable(ENCRYPTION);
-  cc->Enable(SHE);
-  cc->Enable(MULTIPARTY);
-  return cc;
-}
-
-/**
- * @brief Construct a PALISADE CryptoContextImpl for the BGVrns Scheme.
- *
- * @param multiplicativeDepth the depth of multiplications supported by the
- * scheme (equal to number of towers - 1).
- * @param plaintextModulus the plaintext modulus.
- * @param securityLevel the standard security level we want the scheme to satisfy.
- * @param sigma StdDev - distribution parameter for error distribution.
- * @param maxDepth the maximum power of secret key for which the
- * relinearization key is generated.
- * @param mode RLWE (gaussian distribution) or OPTIMIZED (ternary distribution).
- * @param keySwitchTechnique (default) - key switching technique to use (e.g., HYBRID, GHS or BV).
- * @param ringDim (default) - the ring dimension (if not specified selected automatically
- * based on stdLevel).
- * @param numLargeDigits (default) - the number of big digits to use in HYBRID key
- * switching.
- * @param firstModSize (default) - the bit-length of the first modulus.
- * @param dcrtrBits (default) - the size of the moduli in bits.
- * @param relinWindow (default) - the relinearization windows (used in BV key switching,
- * use 0 for RNS decomposition).
- * @param batchSize (default) - the number of slots being used in the ciphertext.
- * @param msMethod (default) - mod switch method.
- * @return new context
- */
-template<typename Element>
-CryptoContext<Element> GenCryptoContextBGVrns(usint multiplicativeDepth,
-                                              usint plaintextModulus,
-                                              SecurityLevel securityLevel,
-                                              double sigma,
-                                              uint32_t maxDepth,
-                                              MODE mode,
-                                              KeySwitchTechnique keySwitchTechnique) {
-  return CryptoContextFactory<Element>::genCryptoContextBGVrns(multiplicativeDepth, plaintextModulus, securityLevel,
-                                                               sigma, maxDepth, mode, keySwitchTechnique);
-}
-
-/**
- * @brief Construct a PALISADE CryptoContextImpl for the CKKS Scheme.
- *
- * @param multiplicativeDepth the depth of multiplications supported by the
- * scheme (equal to number of towers - 1).
- * @param scalingFactorBits the size of the scaling factor in bits.
- * @param batchSize the number of slots being used in the ciphertext.
- * @param securityLevel the standard security level we want the scheme to satisfy.
- * @param ringDim (default) - the ring dimension (if not specified selected automatically
- * based on stdLevel).
- * @param ksTech (default) - key switching technique to use (e.g., HYBRID, GHS or BV).
- * @param rsTech (default) - rescaling technique to use (e.g., APPROXRESCALE or
- * EXACTRESCALE).
- * @param numLargeDigits (default) - the number of big digits to use in HYBRID key
- * switching.
- * @param maxDepth (default) - the maximum power of secret key for which the
- * relinearization key is generated.
- * @param firstModSize (default) - the bit-length of the first modulus.
- * @param relinWindow (default) - the relinearization windows (used in BV key switching,
- * use 0 for RNS decomposition).
- * @param mode (default) - RLWE (gaussian distribution) or OPTIMIZED (ternary
- * distribution).
- * @return new context.
- */
-template<typename Element>
-CryptoContext<Element> GenCryptoContextCKKS(usint multiplicativeDepth,
-                                            usint scaleFactorBits,
-                                            usint batchSize,
-                                            SecurityLevel securityLevel) {
-  return CryptoContextFactory<Element>::genCryptoContextCKKS(multiplicativeDepth, scaleFactorBits, batchSize,
-                                                             securityLevel);
-}
-
-
 
 // TURN FEATURES ON
 /**
@@ -187,7 +43,7 @@ void Enable(const CryptoContext<Element> cryptoCtx, PKESchemeFeature pkeScheme) 
  * @return a public/secret key pair.
  */
 template<typename Element>
-LPKeyPair<Element> KeyGen(CryptoContext<Element> cryptoCtx) {
+KeyPair<Element> KeyGen(CryptoContext<Element> cryptoCtx) {
   return cryptoCtx->KeyGen();
 }
 
@@ -198,7 +54,7 @@ LPKeyPair<Element> KeyGen(CryptoContext<Element> cryptoCtx) {
  * ciphertext.
  */
 template<typename Element>
-void EvalMultKeyGen(const CryptoContext<Element> cryptoCtx, LPPrivateKey<Element> secretKey) {
+void EvalMultKeyGen(const CryptoContext<Element> cryptoCtx, PrivateKey<Element> secretKey) {
   cryptoCtx->EvalMultKeyGen(secretKey);
 }
 
@@ -242,7 +98,7 @@ Plaintext MakeCKKSPackedPlaintext(const CryptoContext<Element> cryptoCtx, std::v
  */
 template<typename Element>
 Ciphertext<Element> Encrypt(const CryptoContext<Element> cryptoCtx,
-                            LPPublicKey<Element> publicKey,
+                            const PublicKey<Element> publicKey,
                             Plaintext plaintext) {
   return cryptoCtx->Encrypt(publicKey, plaintext);
 }
@@ -256,7 +112,7 @@ Ciphertext<Element> Encrypt(const CryptoContext<Element> cryptoCtx,
  */
 template<typename Element>
 Plaintext Decrypt(const CryptoContext<Element> cryptoCtx,
-                  const LPPrivateKey<Element> secretKey,
+                  const PrivateKey<Element> secretKey,
                   Ciphertext<Element> ciphertext) {
   Plaintext result;
   cryptoCtx->Decrypt(secretKey, ciphertext, &result);
@@ -451,13 +307,18 @@ Ciphertext<Element> EvalMerge(const CryptoContext<Element> &cryptoCtx, emscripte
  * @param constants a list of weights.
  * @return new ciphertext containing the weighted sum.
  */
-template<typename Element>
-Ciphertext<Element> EvalLinearWSum(const CryptoContext<Element> &cryptoCtx,
-                                   emscripten::val ciphertexts,
-                                   emscripten::val constants) {
-  return cryptoCtx->EvalLinearWSum(vecFromJSArray < Ciphertext < Element >> (ciphertexts),
-                                   convertJSArrayToNumberVector<double>(constants));
-}
+//template<typename Element>
+//Ciphertext<Element> EvalLinearWSum(const CryptoContext<Element> &cryptoCtx,
+//                                   emscripten::val ciphertexts,
+//                                   emscripten::val constants) {
+//  auto constArr = convertJSArrayToNumberVector<double>(constants);
+//  std::vector<Ciphertext<Element>> container;
+//  auto converted = vecFromJSArray<Ciphertext < Element > >(ciphertexts);
+//  for (auto &el: converted){
+//    container.emplace_back(*el);
+//  }
+//  return cryptoCtx->EvalLinearWSum(container, constArr);
+//}
 
 /**
  * @brief this is a wrapper for the hoisted automorphism
@@ -468,8 +329,8 @@ Ciphertext<Element> EvalLinearWSum(const CryptoContext<Element> &cryptoCtx,
  * (digit decomposition).
  */
 template<typename Element>
-std::shared_ptr<vector<Element>> EvalFastRotationPrecompute(const CryptoContext<Element> &cryptoCtx,
-                                                            Ciphertext<Element> ciphertext) {
+std::shared_ptr<std::vector<Element>> EvalFastRotationPrecompute(const CryptoContext<Element> &cryptoCtx,
+                                                                 Ciphertext<Element> ciphertext) {
   return cryptoCtx->EvalFastRotationPrecompute(ciphertext);
 }
 
@@ -505,9 +366,9 @@ Ciphertext<Element> EvalFastRotation(const CryptoContext<Element> &cryptoCtx,
  */
 template<typename Element>
 Ciphertext<Element> ReEncrypt2(const CryptoContext<Element> &cryptoCtx,
-                               LPEvalKey<Element> evalKey,
+                               EvalKey<Element> evalKey,
                                Ciphertext<Element> ciphertext) {
-  return cryptoCtx->ReEncrypt(evalKey, ciphertext);
+  return cryptoCtx->ReEncrypt(ciphertext, evalKey);
 }
 
 // explicit wrapper methods are required to use
@@ -548,7 +409,7 @@ void ClearEvalSumKeys(const CryptoContext<Element> &cryptoCtx) {
  */
 template<typename Element>
 void InsertEvalSumKey(const CryptoContext<Element> &cryptoCtx,
-                      const std::shared_ptr<std::map<usint, LPEvalKey < Element>>
+                      const std::shared_ptr<std::map<usint, EvalKey < Element>>
 > mapToInsert) {
 cryptoCtx->
 InsertEvalSumKey(mapToInsert);
@@ -562,7 +423,7 @@ InsertEvalSumKey(mapToInsert);
  */
 template<typename Element>
 void InsertEvalMultKey(const CryptoContext<Element> &cryptoCtx, const emscripten::val &evalKeyVector) {
-  const auto vectorToInsert = vecFromJSArray < LPEvalKey < Element >> (evalKeyVector);
+  const auto vectorToInsert = vecFromJSArray < EvalKey < Element >> (evalKeyVector);
   cryptoCtx->InsertEvalMultKey(vectorToInsert);
 }
 
@@ -705,7 +566,7 @@ void DeserializeEvalSumKeyFromBuffer(const CryptoContext<Element> &cryptoCtx,
  */
 template<typename Element>
 void EvalAtIndexKeyGen(const CryptoContext<Element> &cryptoCtx,
-                       const LPPrivateKey<Element> privateKey,
+                       const PrivateKey<Element> privateKey,
                        const emscripten::val indexList) {
   auto indexVec = vecFromJSArray<int32_t>(indexList);
   cryptoCtx->EvalAtIndexKeyGen(privateKey, indexVec);
@@ -719,7 +580,7 @@ void EvalAtIndexKeyGen(const CryptoContext<Element> &cryptoCtx,
  * @param publicKey public key (used in NTRU schemes).
  */
 template<typename Element>
-void EvalSumKeyGen1(const CryptoContext<Element> &cryptoCtx, const LPPrivateKey<Element> privateKey) {
+void EvalSumKeyGen1(const CryptoContext<Element> &cryptoCtx, const PrivateKey<Element> privateKey) {
   cryptoCtx->EvalSumKeyGen(privateKey);
 }
 
@@ -738,7 +599,7 @@ void EvalSumKeyGen1(const CryptoContext<Element> &cryptoCtx, const LPPrivateKey<
  * joined public key
  */
 template<typename Element>
-LPKeyPair<Element> MultipartyKeyGen(const CryptoContext<Element> &cryptoCtx, const LPPublicKey<Element> pk) {
+KeyPair<Element> MultipartyKeyGen(const CryptoContext<Element> &cryptoCtx, const PublicKey<Element> pk) {
   return cryptoCtx->MultipartyKeyGen(pk);
 }
 // custom wrapper methods for convenience.
@@ -760,10 +621,10 @@ LPKeyPair<Element> MultipartyKeyGen(const CryptoContext<Element> &cryptoCtx, con
  */
 template<typename Element>
 std::vector<Ciphertext<Element>> MultipartyDecryptLead(const CryptoContext<Element> &cryptoCtx,
-                                                       const LPPrivateKey<Element> privateKey,
+                                                       const PrivateKey<Element> privateKey,
                                                        const emscripten::val &ciphertextVecJs) {
   const auto ciphertextVec = vecFromJSArray < Ciphertext < Element >> (ciphertextVecJs);
-  return cryptoCtx->MultipartyDecryptLead(privateKey, ciphertextVec);
+  return cryptoCtx->MultipartyDecryptLead(ciphertextVec, privateKey);
 }
 
 /**
@@ -776,10 +637,10 @@ std::vector<Ciphertext<Element>> MultipartyDecryptLead(const CryptoContext<Eleme
  */
 template<typename Element>
 std::vector<Ciphertext<Element>> MultipartyDecryptMain(const CryptoContext<Element> &cryptoCtx,
-                                                       const LPPrivateKey<Element> privateKey,
+                                                       const PrivateKey<Element> privateKey,
                                                        const emscripten::val &ciphertextVecJs) {
   const auto ciphertext = vecFromJSArray < Ciphertext < Element >> (ciphertextVecJs);
-  return cryptoCtx->MultipartyDecryptMain(privateKey, ciphertext);
+  return cryptoCtx->MultipartyDecryptMain(ciphertext, privateKey);
 }
 
 /**
@@ -811,10 +672,10 @@ Plaintext MultipartyDecryptFusion(const CryptoContext<Element> &cryptoCtx,
  * @return the EvalSum key map.
  */
 template<typename Element>
-std::shared_ptr<std::map<usint, LPEvalKey < Element>>>
+std::shared_ptr<std::map<usint, EvalKey < Element>>>
 GetEvalSumKeyMap(const CryptoContext<Element> &cryptoCtx,
                  const std::string &keyId) {
-  return std::make_shared < std::map < usint, LPEvalKey < Element>>>(cryptoCtx->GetEvalSumKeyMap(keyId));
+  return std::make_shared < std::map < usint, EvalKey < Element>>>(cryptoCtx->GetEvalSumKeyMap(keyId));
 }
 
 /**
@@ -849,38 +710,23 @@ int GetPlaintextModulus(const CryptoContext<Element> &cryptoCtx) {
 
 using CC = CryptoContextImpl<DCRTPoly>;
 EMSCRIPTEN_BINDINGS(CryproContext) {
-    emscripten::function("GenCryptoContextBFVrns", &GenCryptoContextBFVrns<DCRTPoly>);
-    emscripten::function(
-    "GenCryptoContextBFVrns",
-    select_overload<CryptoContext<DCRTPoly>(uint32_t, uint32_t, SecurityLevel, float, unsigned int, MODE, int, uint32_t, size_t, uint32_t)>(
-    &GenCryptoContextBFVrns2<DCRTPoly>));
 
-    emscripten::function("GenCryptoContextBGVrns", &GenCryptoContextBGVrns<DCRTPoly>);
-    emscripten::function("GenCryptoContextCKKS", &GenCryptoContextCKKS<DCRTPoly>);
-    emscripten::function(
-    "GenCryptoContextCKKS",
-    select_overload<CryptoContext<DCRTPoly>(usint, usint, usint, SecurityLevel, usint, RescalingTechnique,
-    KeySwitchTechnique, uint32_t, int, usint, usint, MODE)>(
-    &CryptoContextFactory<DCRTPoly>::genCryptoContextCKKS));
-
-    emscripten::register_vector<Ciphertext<DCRTPoly>>("VectorCiphertextDCRTPoly");
-    emscripten::register_vector<LPEvalKey<DCRTPoly>>("VectorLPEvalKeyDCRTPoly");
+    emscripten::register_vector < Ciphertext < DCRTPoly >> ("VectorCiphertextDCRTPoly");
+    emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");
     emscripten::register_vector<DCRTPoly>("VectorDCRTPoly")
     .smart_ptr<std::shared_ptr<std::vector<DCRTPoly>>>("VectorDCRTPoly");
 
-    emscripten::register_map<usint, LPEvalKey<DCRTPoly>>("UnsignedIntToLPEvalKey_DCRTPolyMap")
-    .smart_ptr<std::shared_ptr<std::map<usint, LPEvalKey<DCRTPoly>>>>("UnsignedIntToLPEvalKey_DCRTPolyMap");
+    emscripten::register_map<usint, EvalKey<DCRTPoly>>("UnsignedIntToEvalKey_DCRTPolyMap")
+    .smart_ptr<std::shared_ptr<std::map<usint, EvalKey<DCRTPoly>>>>("UnsignedIntToEvalKey_DCRTPolyMap");
 
     class_<CryptoContextImpl<DCRTPoly>>("CryptoContext_DCRTPoly")
     .smart_ptr<CryptoContext<DCRTPoly>>("CryptoContext_DCRTPoly")
     .constructor(&std::make_shared<CryptoContextImpl<DCRTPoly>>, allow_raw_pointers())
     // ignoring mult-feature Enable() for now
     .function("Enable", select_overload<void(PKESchemeFeature)>(&CC::Enable))
+    .function("Encrypt", &Encrypt<DCRTPoly>)// select_overload<Ciphertext<DCRTPoly>(Plaintext, const PublicKey<DCRTPoly>)>(&CC::Encrypt))
     .function("KeyGen", &CC::KeyGen)
     // select_overload() required because the other overload is deprecated
-    .function("ReKeyGen",
-    select_overload<LPEvalKey<DCRTPoly>(const LPPublicKey<DCRTPoly>, const LPPrivateKey<DCRTPoly>) const>(
-    &CC::ReKeyGen))
     .function("MultipartyKeyGen", &MultipartyKeyGen<DCRTPoly>)
     .function("KeySwitchGen", &CC::KeySwitchGen)
     .function("MultiKeySwitchGen", &CC::MultiKeySwitchGen)
@@ -895,6 +741,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
     .function("MultipartyDecryptMain", &MultipartyDecryptMain<DCRTPoly>)
     .function("MultipartyDecryptFusion", &MultipartyDecryptFusion<DCRTPoly>)
     .function("GetCryptoParameters", &CC::GetCryptoParameters)
+    .function("GetElementParams", &CC::GetElementParams)
     .function("EvalMultKeyGen", &CC::EvalMultKeyGen)
     // emscripten DOES support overloading based on # of params
     // 3 args
@@ -904,7 +751,6 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
     .function("MakePackedPlaintext", &CC::MakePackedPlaintext)
     .function("MakeCKKSPackedPlaintext", &MakeCKKSPackedPlaintext<DCRTPoly>)
     // select_overload() required because the other overload is deprecated
-    .function("Encrypt", select_overload<Ciphertext<DCRTPoly>(LPPublicKey<DCRTPoly>, Plaintext)>(&CC::Encrypt))
     .function("ReEncrypt", &ReEncrypt2<DCRTPoly>)
     .function("Decrypt", &Decrypt<DCRTPoly>, allow_raw_pointers())
     .function("EvalAddCipherCipher", EvalAddCipherCipher<DCRTPoly>)
@@ -920,7 +766,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
     .function("EvalInnerProduct", &EvalInnerProduct<DCRTPoly>)
     .function("EvalMultMany", &EvalMultMany<DCRTPoly>)
     .function("EvalMerge", &EvalMerge<DCRTPoly>)
-    .function("EvalLinearWSum", &EvalLinearWSum<DCRTPoly>)
+//    .function("EvalLinearWSum", &EvalLinearWSum<DCRTPoly>)
     .function("ModReduce", &ModReduce<DCRTPoly>)
     .function("EvalSumKeyGen", &EvalSumKeyGen1<DCRTPoly>)
     .function("GetEvalSumKeyMap", &GetEvalSumKeyMap<DCRTPoly>)
@@ -939,7 +785,3 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
     .function("DeserializeEvalAutomorphismKeyFromBuffer", &DeserializeEvalAutomorphismKeyFromBuffer<DCRTPoly>)
     .function("DeserializeEvalSumKeyFromBuffer", &DeserializeEvalSumKeyFromBuffer<DCRTPoly>);
 }
-
-
-
-
