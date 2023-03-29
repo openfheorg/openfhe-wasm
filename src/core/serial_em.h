@@ -23,7 +23,7 @@ std::istringstream typedArrayToStringstream(const emscripten::val &jsBuf) {
  * @param serType - #BINARY or #JSON
  * @return serialized buffer.
  */
-template <typename Element>
+template<typename Element>
 emscripten::val SerializeToBuffer(const Element &obj, JsSerType serType) {
   std::ostringstream outputBuffer;
 
@@ -42,7 +42,7 @@ emscripten::val SerializeToBuffer(const Element &obj, JsSerType serType) {
  * @param serType - #BINARY or #JSON
  * @return OPENFHE object.
  */
-template <typename Element>
+template<typename Element>
 Element DeserializeFromBuffer(const emscripten::val &jsBuf, JsSerType serType) {
   Element obj;
   auto stream = typedArrayToStringstream(jsBuf);

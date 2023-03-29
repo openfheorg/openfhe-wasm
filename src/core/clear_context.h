@@ -4,10 +4,9 @@
 
 #include "openfhe.h"
 
-void ReleaseAllContexts(){
+void ReleaseAllContexts() {
   lbcrypto::CryptoContextFactory<lbcrypto::DCRTPoly>::ReleaseAllContexts();
 }
-
 
 EMSCRIPTEN_BINDINGS(clear_contexts) {
   emscripten::function("ReleaseAllContexts", &ReleaseAllContexts);

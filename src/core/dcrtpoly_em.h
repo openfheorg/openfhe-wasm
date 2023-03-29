@@ -10,7 +10,7 @@
  * @brief Get the element's cyclotomic order
  * @return returns the cyclotomic order of the element as 32bit value.
  */
-template <typename Element>
+template<typename Element>
 usint GetCyclotomicOrder(const typename Element::Params &params) {
   return params.GetCyclotomicOrder();
 }
@@ -23,7 +23,7 @@ usint GetCyclotomicOrder(const typename Element::Params &params) {
  * @param params Element's params.
  * @return The ciphertext modulus.
  */
-template <typename Element>
+template<typename Element>
 typename Element::Integer GetModulus(const typename Element::Params &params) {
   return params.GetModulus();
 }

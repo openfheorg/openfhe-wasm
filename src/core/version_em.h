@@ -7,7 +7,7 @@
 using namespace emscripten;
 
 EMSCRIPTEN_BINDINGS(openfhe_version) {
-	emscripten::function("GetOPENFHEVersion", &GetOPENFHEVersion);
+  emscripten::function("GetOPENFHEVersion", &GetOPENFHEVersion);
 }
 
 #endif

@@ -12,7 +12,7 @@ using namespace lbcrypto;
  * @return nullptr - in case of exception.
  * @return CryptoContext.
  */
-template <typename Element>
+template<typename Element>
 CryptoContext<Element> DeserializeCryptoContextFromBuffer(const emscripten::val &jsBuf, JsSerType serType) {
   CryptoContext<Element> cc;
   auto stream = typedArrayToStringstream(jsBuf);
