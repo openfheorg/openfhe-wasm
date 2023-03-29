@@ -1,4 +1,4 @@
-// Palisade Includes
+// OpenFHE Includes
 #include "openfhe.h"
 #include "ciphertext-ser.h"
 #include "cryptocontext-ser.h"
@@ -20,6 +20,7 @@ using namespace emscripten;
 #include "core/exception_em.h"
 #include "core/dcrtpoly_em.h"
 #include "core/version_em.h"
+#include "core/parameters.h"
 #include "pubkeylp_em.h"
 #include "pke_serial_em.h"
 #include "core/backend_em.h"
@@ -226,7 +227,7 @@ Ciphertext<Element> EvalAtIndex(const CryptoContext<Element> &cryptoCtx,
 }
 
 /**
- * @brief PALISADE ModReduce method used only for BGVrns.
+ * @brief OpenFHE ModReduce method used only for BGVrns.
  * @param cryptoCtx - Reference to CryptoContext from JS.
  * @param ciphertext - Input ciphertext.
  * @return mod reduced ciphertext.
@@ -265,7 +266,7 @@ Ciphertext<Element> EvalInnerProduct(const CryptoContext<Element> &cryptoCtx,
 }
 
 /**
- * @details PALISADE function for evaluating multiplication on
+ * @details OpenFHE function for evaluating multiplication on
  * ciphertext followed by relinearization operation (at the end). It computes
  * the multiplication in a binary tree manner. Also, it reduces the number of
  * elements in the ciphertext to two after each multiplication.
@@ -279,7 +280,7 @@ Ciphertext<Element> EvalInnerProduct(const CryptoContext<Element> &cryptoCtx,
  */
 template<typename Element>
 Ciphertext<Element> EvalMultMany(const CryptoContext<Element> &cryptoCtx, emscripten::val ciphertextList) {
-  auto ciphertextVec = vecFromJSArray < Ciphertext < Element >> (ciphertextList);
+  auto ciphertextVec = vecFromJSArray<Ciphertext<Element >>(ciphertextList);
   return cryptoCtx->EvalMultMany(ciphertextVec);
 }
 
@@ -294,12 +295,12 @@ Ciphertext<Element> EvalMultMany(const CryptoContext<Element> &cryptoCtx, emscri
  */
 template<typename Element>
 Ciphertext<Element> EvalMerge(const CryptoContext<Element> &cryptoCtx, emscripten::val ciphertextVector) {
-  auto ciphertextVec = vecFromJSArray < Ciphertext < Element >> (ciphertextVector);
+  auto ciphertextVec = vecFromJSArray<Ciphertext<Element >>(ciphertextVector);
   return cryptoCtx->EvalMerge(ciphertextVec);
 }
 
 /**
- * @brief PALISADE EvalLinearWSum method to compute a linear
+ * @brief OpenFHE EvalLinearWSum method to compute a linear
  * weighted sum.
  *
  * @param cryptoCtx - Reference to CryptoContext from JS.
@@ -356,7 +357,7 @@ Ciphertext<Element> EvalFastRotation(const CryptoContext<Element> &cryptoCtx,
 }
 
 /**
- * @brief Proxy Re Encryption mechanism for PALISADE.
+ * @brief Proxy Re Encryption mechanism for OpenFHE.
  * @param cryptoCtx - Reference to CryptoContext from JS.
  * @param evalKey - evaluation key from the PRE keygen method.
  * @param ciphertext - vector of shared pointers to encrypted Ciphertext.
@@ -409,10 +410,10 @@ void ClearEvalSumKeys(const CryptoContext<Element> &cryptoCtx) {
  */
 template<typename Element>
 void InsertEvalSumKey(const CryptoContext<Element> &cryptoCtx,
-                      const std::shared_ptr<std::map<usint, EvalKey < Element>>
-> mapToInsert) {
-cryptoCtx->
-InsertEvalSumKey(mapToInsert);
+                      const std::shared_ptr<std::map<usint, EvalKey<Element>>
+                      > mapToInsert) {
+  cryptoCtx->
+      InsertEvalSumKey(mapToInsert);
 }
 
 /**
@@ -423,7 +424,7 @@ InsertEvalSumKey(mapToInsert);
  */
 template<typename Element>
 void InsertEvalMultKey(const CryptoContext<Element> &cryptoCtx, const emscripten::val &evalKeyVector) {
-  const auto vectorToInsert = vecFromJSArray < EvalKey < Element >> (evalKeyVector);
+  const auto vectorToInsert = vecFromJSArray<EvalKey<Element >>(evalKeyVector);
   cryptoCtx->InsertEvalMultKey(vectorToInsert);
 }
 
@@ -623,7 +624,7 @@ template<typename Element>
 std::vector<Ciphertext<Element>> MultipartyDecryptLead(const CryptoContext<Element> &cryptoCtx,
                                                        const PrivateKey<Element> privateKey,
                                                        const emscripten::val &ciphertextVecJs) {
-  const auto ciphertextVec = vecFromJSArray < Ciphertext < Element >> (ciphertextVecJs);
+  const auto ciphertextVec = vecFromJSArray<Ciphertext<Element >>(ciphertextVecJs);
   return cryptoCtx->MultipartyDecryptLead(ciphertextVec, privateKey);
 }
 
@@ -639,7 +640,7 @@ template<typename Element>
 std::vector<Ciphertext<Element>> MultipartyDecryptMain(const CryptoContext<Element> &cryptoCtx,
                                                        const PrivateKey<Element> privateKey,
                                                        const emscripten::val &ciphertextVecJs) {
-  const auto ciphertext = vecFromJSArray < Ciphertext < Element >> (ciphertextVecJs);
+  const auto ciphertext = vecFromJSArray<Ciphertext<Element >>(ciphertextVecJs);
   return cryptoCtx->MultipartyDecryptMain(ciphertext, privateKey);
 }
 
@@ -654,7 +655,7 @@ std::vector<Ciphertext<Element>> MultipartyDecryptMain(const CryptoContext<Eleme
 template<typename Element>
 Plaintext MultipartyDecryptFusion(const CryptoContext<Element> &cryptoCtx,
                                   const emscripten::val &partialCiphertextVecJs) {
-  const auto partialCiphertextVec = vecFromJSArray < Ciphertext < Element >> (partialCiphertextVecJs);
+  const auto partialCiphertextVec = vecFromJSArray<Ciphertext<Element >>(partialCiphertextVecJs);
   Plaintext plaintext;
   cryptoCtx->MultipartyDecryptFusion(partialCiphertextVec, &plaintext);
   return plaintext;
@@ -672,10 +673,10 @@ Plaintext MultipartyDecryptFusion(const CryptoContext<Element> &cryptoCtx,
  * @return the EvalSum key map.
  */
 template<typename Element>
-std::shared_ptr<std::map<usint, EvalKey < Element>>>
+std::shared_ptr<std::map<usint, EvalKey<Element>>>
 GetEvalSumKeyMap(const CryptoContext<Element> &cryptoCtx,
                  const std::string &keyId) {
-  return std::make_shared < std::map < usint, EvalKey < Element>>>(cryptoCtx->GetEvalSumKeyMap(keyId));
+  return std::make_shared<std::map<usint, EvalKey<Element>>>(cryptoCtx->GetEvalSumKeyMap(keyId));
 }
 
 /**
@@ -711,77 +712,78 @@ int GetPlaintextModulus(const CryptoContext<Element> &cryptoCtx) {
 using CC = CryptoContextImpl<DCRTPoly>;
 EMSCRIPTEN_BINDINGS(CryproContext) {
 
-    emscripten::register_vector < Ciphertext < DCRTPoly >> ("VectorCiphertextDCRTPoly");
-    emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");
-    emscripten::register_vector<DCRTPoly>("VectorDCRTPoly")
-    .smart_ptr<std::shared_ptr<std::vector<DCRTPoly>>>("VectorDCRTPoly");
+  emscripten::register_vector<Ciphertext<DCRTPoly >>("VectorCiphertextDCRTPoly");
+  emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");
+  emscripten::register_vector<DCRTPoly>("VectorDCRTPoly")
+      .smart_ptr<std::shared_ptr<std::vector<DCRTPoly>>>("VectorDCRTPoly");
 
-    emscripten::register_map<usint, EvalKey<DCRTPoly>>("UnsignedIntToEvalKey_DCRTPolyMap")
-    .smart_ptr<std::shared_ptr<std::map<usint, EvalKey<DCRTPoly>>>>("UnsignedIntToEvalKey_DCRTPolyMap");
+  emscripten::register_map<usint, EvalKey<DCRTPoly>>("UnsignedIntToEvalKey_DCRTPolyMap")
+      .smart_ptr<std::shared_ptr<std::map<usint, EvalKey<DCRTPoly>>>>("UnsignedIntToEvalKey_DCRTPolyMap");
 
-    class_<CryptoContextImpl<DCRTPoly>>("CryptoContext_DCRTPoly")
-    .smart_ptr<CryptoContext<DCRTPoly>>("CryptoContext_DCRTPoly")
-    .constructor(&std::make_shared<CryptoContextImpl<DCRTPoly>>, allow_raw_pointers())
-    // ignoring mult-feature Enable() for now
-    .function("Enable", select_overload<void(PKESchemeFeature)>(&CC::Enable))
-    .function("Encrypt", &Encrypt<DCRTPoly>)// select_overload<Ciphertext<DCRTPoly>(Plaintext, const PublicKey<DCRTPoly>)>(&CC::Encrypt))
-    .function("KeyGen", &CC::KeyGen)
-    // select_overload() required because the other overload is deprecated
-    .function("MultipartyKeyGen", &MultipartyKeyGen<DCRTPoly>)
-    .function("KeySwitchGen", &CC::KeySwitchGen)
-    .function("MultiKeySwitchGen", &CC::MultiKeySwitchGen)
-    .function("MultiAddEvalKeys", &CC::MultiAddEvalKeys)
-    .function("MultiAddEvalMultKeys", &CC::MultiAddEvalMultKeys)
-    .function("MultiAddEvalSumKeys", &CC::MultiAddEvalSumKeys)
-    .function("InsertEvalSumKey", &InsertEvalSumKey<DCRTPoly>)
-    .function("InsertEvalMultKey", &InsertEvalMultKey<DCRTPoly>)
-    .function("MultiMultEvalKey", &CC::MultiMultEvalKey)
-    .function("MultiEvalSumKeyGen", &CC::MultiEvalSumKeyGen)
-    .function("MultipartyDecryptLead", &MultipartyDecryptLead<DCRTPoly>)
-    .function("MultipartyDecryptMain", &MultipartyDecryptMain<DCRTPoly>)
-    .function("MultipartyDecryptFusion", &MultipartyDecryptFusion<DCRTPoly>)
-    .function("GetCryptoParameters", &CC::GetCryptoParameters)
-    .function("GetElementParams", &CC::GetElementParams)
-    .function("EvalMultKeyGen", &CC::EvalMultKeyGen)
-    // emscripten DOES support overloading based on # of params
-    // 3 args
-    .function("EvalAtIndexKeyGen", &CC::EvalAtIndexKeyGen)
-    // 2 args
-    .function("EvalAtIndexKeyGen", &EvalAtIndexKeyGen<DCRTPoly>)
-    .function("MakePackedPlaintext", &CC::MakePackedPlaintext)
-    .function("MakeCKKSPackedPlaintext", &MakeCKKSPackedPlaintext<DCRTPoly>)
-    // select_overload() required because the other overload is deprecated
-    .function("ReEncrypt", &ReEncrypt2<DCRTPoly>)
-    .function("Decrypt", &Decrypt<DCRTPoly>, allow_raw_pointers())
-    .function("EvalAddCipherCipher", EvalAddCipherCipher<DCRTPoly>)
-    .function("EvalMultCipherCipher", EvalMultCipherCipher<DCRTPoly>)
-    .function("EvalMultCipherPlaintext", EvalMultCipherPlaintext<DCRTPoly>)
-    .function("EvalSubCipherCipher", EvalSubCipherCipher<DCRTPoly>)
-    .function("EvalMultCipherConstant", EvalMultCipherConstant<DCRTPoly>)
-    .function("EvalNegate", &EvalNegate<DCRTPoly>)
-    .function("EvalAtIndex", &EvalAtIndex<DCRTPoly>)
-    .function("EvalFastRotationPrecompute", &EvalFastRotationPrecompute<DCRTPoly>)
-    .function("EvalFastRotation", &EvalFastRotation<DCRTPoly>)
-    .function("EvalSum", &EvalSum<DCRTPoly>)
-    .function("EvalInnerProduct", &EvalInnerProduct<DCRTPoly>)
-    .function("EvalMultMany", &EvalMultMany<DCRTPoly>)
-    .function("EvalMerge", &EvalMerge<DCRTPoly>)
+  class_<CryptoContextImpl<DCRTPoly>>("CryptoContext_DCRTPoly")
+      .smart_ptr<CryptoContext<DCRTPoly>>("CryptoContext_DCRTPoly")
+      .constructor(&std::make_shared<CryptoContextImpl<DCRTPoly>>, allow_raw_pointers())
+          // ignoring mult-feature Enable() for now
+      .function("Enable", select_overload<void(PKESchemeFeature)>(&CC::Enable))
+      .function("Encrypt",
+                &Encrypt<DCRTPoly>)// select_overload<Ciphertext<DCRTPoly>(Plaintext, const PublicKey<DCRTPoly>)>(&CC::Encrypt))
+      .function("KeyGen", &CC::KeyGen)
+          // select_overload() required because the other overload is deprecated
+      .function("MultipartyKeyGen", &MultipartyKeyGen<DCRTPoly>)
+      .function("KeySwitchGen", &CC::KeySwitchGen)
+      .function("MultiKeySwitchGen", &CC::MultiKeySwitchGen)
+      .function("MultiAddEvalKeys", &CC::MultiAddEvalKeys)
+      .function("MultiAddEvalMultKeys", &CC::MultiAddEvalMultKeys)
+      .function("MultiAddEvalSumKeys", &CC::MultiAddEvalSumKeys)
+      .function("InsertEvalSumKey", &InsertEvalSumKey<DCRTPoly>)
+      .function("InsertEvalMultKey", &InsertEvalMultKey<DCRTPoly>)
+      .function("MultiMultEvalKey", &CC::MultiMultEvalKey)
+      .function("MultiEvalSumKeyGen", &CC::MultiEvalSumKeyGen)
+      .function("MultipartyDecryptLead", &MultipartyDecryptLead<DCRTPoly>)
+      .function("MultipartyDecryptMain", &MultipartyDecryptMain<DCRTPoly>)
+      .function("MultipartyDecryptFusion", &MultipartyDecryptFusion<DCRTPoly>)
+      .function("GetCryptoParameters", &CC::GetCryptoParameters)
+      .function("GetElementParams", &CC::GetElementParams)
+      .function("EvalMultKeyGen", &CC::EvalMultKeyGen)
+          // emscripten DOES support overloading based on # of params
+          // 3 args
+      .function("EvalAtIndexKeyGen", &CC::EvalAtIndexKeyGen)
+          // 2 args
+      .function("EvalAtIndexKeyGen", &EvalAtIndexKeyGen<DCRTPoly>)
+      .function("MakePackedPlaintext", &CC::MakePackedPlaintext)
+      .function("MakeCKKSPackedPlaintext", &MakeCKKSPackedPlaintext<DCRTPoly>)
+          // select_overload() required because the other overload is deprecated
+      .function("ReEncrypt", &ReEncrypt2<DCRTPoly>)
+      .function("Decrypt", &Decrypt<DCRTPoly>, allow_raw_pointers())
+      .function("EvalAddCipherCipher", EvalAddCipherCipher<DCRTPoly>)
+      .function("EvalMultCipherCipher", EvalMultCipherCipher<DCRTPoly>)
+      .function("EvalMultCipherPlaintext", EvalMultCipherPlaintext<DCRTPoly>)
+      .function("EvalSubCipherCipher", EvalSubCipherCipher<DCRTPoly>)
+      .function("EvalMultCipherConstant", EvalMultCipherConstant<DCRTPoly>)
+      .function("EvalNegate", &EvalNegate<DCRTPoly>)
+      .function("EvalAtIndex", &EvalAtIndex<DCRTPoly>)
+      .function("EvalFastRotationPrecompute", &EvalFastRotationPrecompute<DCRTPoly>)
+      .function("EvalFastRotation", &EvalFastRotation<DCRTPoly>)
+      .function("EvalSum", &EvalSum<DCRTPoly>)
+      .function("EvalInnerProduct", &EvalInnerProduct<DCRTPoly>)
+      .function("EvalMultMany", &EvalMultMany<DCRTPoly>)
+      .function("EvalMerge", &EvalMerge<DCRTPoly>)
 //    .function("EvalLinearWSum", &EvalLinearWSum<DCRTPoly>)
-    .function("ModReduce", &ModReduce<DCRTPoly>)
-    .function("EvalSumKeyGen", &EvalSumKeyGen1<DCRTPoly>)
-    .function("GetEvalSumKeyMap", &GetEvalSumKeyMap<DCRTPoly>)
-    .function("GetRingDimension", &CC::GetRingDimension)
-    .function("Compress", &Compress<DCRTPoly>)
-    .function("GetBatchSize", &GetBatchSize<DCRTPoly>)
-    .function("GetPlaintextModulus", &GetPlaintextModulus<DCRTPoly>)
-    // serialization
-    .function("ClearEvalMultKeys", ClearEvalMultKeys<DCRTPoly>)
-    .function("ClearEvalAutomorphismKeys", ClearEvalAutomorphismKeys<DCRTPoly>)
-    .function("ClearEvalSumKeys", ClearEvalAutomorphismKeys<DCRTPoly>)
-    .function("SerializeEvalMultKeyToBuffer", &SerializeEvalMultKeyToBuffer<DCRTPoly>)
-    .function("SerializeEvalAutomorphismKeyToBuffer", &SerializeEvalAutomorphismKeyToBuffer<DCRTPoly>)
-    .function("SerializeEvalSumKeyToBuffer", &SerializeEvalSumKeyToBuffer<DCRTPoly>)
-    .function("DeserializeEvalMultKeyFromBuffer", &DeserializeEvalMultKeyFromBuffer<DCRTPoly>)
-    .function("DeserializeEvalAutomorphismKeyFromBuffer", &DeserializeEvalAutomorphismKeyFromBuffer<DCRTPoly>)
-    .function("DeserializeEvalSumKeyFromBuffer", &DeserializeEvalSumKeyFromBuffer<DCRTPoly>);
+      .function("ModReduce", &ModReduce<DCRTPoly>)
+      .function("EvalSumKeyGen", &EvalSumKeyGen1<DCRTPoly>)
+      .function("GetEvalSumKeyMap", &GetEvalSumKeyMap<DCRTPoly>)
+      .function("GetRingDimension", &CC::GetRingDimension)
+      .function("Compress", &Compress<DCRTPoly>)
+      .function("GetBatchSize", &GetBatchSize<DCRTPoly>)
+      .function("GetPlaintextModulus", &GetPlaintextModulus<DCRTPoly>)
+          // serialization
+      .function("ClearEvalMultKeys", ClearEvalMultKeys<DCRTPoly>)
+      .function("ClearEvalAutomorphismKeys", ClearEvalAutomorphismKeys<DCRTPoly>)
+      .function("ClearEvalSumKeys", ClearEvalAutomorphismKeys<DCRTPoly>)
+      .function("SerializeEvalMultKeyToBuffer", &SerializeEvalMultKeyToBuffer<DCRTPoly>)
+      .function("SerializeEvalAutomorphismKeyToBuffer", &SerializeEvalAutomorphismKeyToBuffer<DCRTPoly>)
+      .function("SerializeEvalSumKeyToBuffer", &SerializeEvalSumKeyToBuffer<DCRTPoly>)
+      .function("DeserializeEvalMultKeyFromBuffer", &DeserializeEvalMultKeyFromBuffer<DCRTPoly>)
+      .function("DeserializeEvalAutomorphismKeyFromBuffer", &DeserializeEvalAutomorphismKeyFromBuffer<DCRTPoly>)
+      .function("DeserializeEvalSumKeyFromBuffer", &DeserializeEvalSumKeyFromBuffer<DCRTPoly>);
 }

@@ -1,5 +1,4 @@
 /*
- *
  * //==================================================================================
  * // BSD 2-Clause License
  * //
@@ -39,5 +38,19 @@
 //
 //template<typename CryptoScheme>
 //lbcrypto::CCParams<CryptoScheme> crea
+
+
+#include <emscripten.h>
+#include <emscripten/bind.h>
+
+EMSCRIPTEN_BINDINGS(parameters) {
+  class_<BigInteger>("Parameters")
+      .constructor<std::string>()
+      .function("DividedBy", &BigInteger::DividedBy)
+      .function("ConvertToDouble", &BigInteger::ConvertToDouble)
+      .function("ToString", &BigInteger::ToString);
+
+  class_<EncodingParamsImpl>("EncodingParams").smart_ptr<std::shared_ptr<EncodingParamsImpl>>("EncodingParams");
+}
 
 #endif //OPENFHE_WASM_SRC_CORE_PARAMETERS_H_

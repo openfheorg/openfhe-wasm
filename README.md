@@ -29,24 +29,15 @@ schemes supported by OpenFHE and exposes an API similar to the C++ API for OpenF
 export PREFIX=~/install/location
 mkdir embuild
 cd embuild
-emcmake cmake .. -DCMAKE_INSTALL_PREFIX=${PREFIX}
+emcmake cmake .. -DCMAKE_INSTALL_PREFIX=${PREFIX} -DMATHBACKEND=4
 emmake make -jN
-```
-
-**Note**: `N` is number of cores available on your system.
-
-to do the cmake configuration. Here, `~/install/location` can be replaced with any empty directory at the desired
-location where openfhe binaries should be installed.
-
-6. Run
-
-```
 emmake make install
 ```
 
-to install the binaries in the desired location.
-
-**Note**: To include the unit tests, examples, or benchmarks, the corresponding cmake flags can be set to "ON" instead of "OFF".
+**Note**: 
+- `N` is number of cores available on your system.
+- `~/install/location` can be any empty directory location where openfhe binaries should be installed. 
+- To include the unit tests, examples, or benchmarks, the corresponding cmake flags can be set to "ON" instead of "OFF".
 
 ### Building OpenFHE-WASM
 

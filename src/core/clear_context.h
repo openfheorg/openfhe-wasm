@@ -1,6 +1,3 @@
-//
-// Created by iq on 6/16/22.
-//
 
 #ifndef CLEAR_CONTEXT_H
 #define CLEAR_CONTEXT_H

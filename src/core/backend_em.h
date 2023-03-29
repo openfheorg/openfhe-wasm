@@ -1,6 +1,3 @@
-//
-// Created by iq on 6/16/22.
-//
 
 #ifndef BACKEND_EM_H
 #define BACKEND_EM_H
