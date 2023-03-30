@@ -43,14 +43,29 @@
 #include <emscripten.h>
 #include <emscripten/bind.h>
 
+using P_BFV = CCParams<CryptoContextBFVRNS>;
+using P_BGV = CCParams<CryptoContextBGVRNS>;
+using P_CKKS = CCParams<CryptoContextCKKSRNS>;
 EMSCRIPTEN_BINDINGS(parameters) {
-  class_<BigInteger>("Parameters")
-      .constructor<std::string>()
-      .function("DividedBy", &BigInteger::DividedBy)
-      .function("ConvertToDouble", &BigInteger::ConvertToDouble)
-      .function("ToString", &BigInteger::ToString);
+  class_<P_BFV>("CCParamsFV")
+      .constructor<>()
+      .function("SetPlaintextModulus", &P_BFV::SetPlaintextModulus)
+      .function("SetMultiplicativeDepth", &P_BFV::SetMultiplicativeDepth)
+      .function("SetScalingModSize", &P_BFV::SetScalingModSize)
+      ;
+  class_<P_BGV>("CCParamsBGV")
+      .constructor<>()
+      .function("SetPlaintextModulus", &P_BGV::SetPlaintextModulus)
+      .function("SetMultiplicativeDepth", &P_BGV::SetMultiplicativeDepth)
+      .function("SetScalingModSize", &P_BGV::SetScalingModSize)
+      ;
 
-  class_<EncodingParamsImpl>("EncodingParams").smart_ptr<std::shared_ptr<EncodingParamsImpl>>("EncodingParams");
+  class_<P_CKKS>("CCParamsCKKS")
+      .constructor<>()
+      .function("SetPlaintextModulus", &P_CKKS::SetPlaintextModulus)
+      .function("SetMultiplicativeDepth", &P_CKKS::SetMultiplicativeDepth)
+      .function("SetScalingModSize", &P_CKKS::SetScalingModSize)
+      ;
 }
 
 #endif //OPENFHE_WASM_SRC_CORE_PARAMETERS_H_

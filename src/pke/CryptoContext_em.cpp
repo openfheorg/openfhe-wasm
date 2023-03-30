@@ -20,58 +20,29 @@ using namespace emscripten;
 #include "core/exception_em.h"
 #include "core/dcrtpoly_em.h"
 #include "core/version_em.h"
-#include "core/parameters.h"
+//#include "core/parameters.h"
 #include "pubkeylp_em.h"
 #include "pke_serial_em.h"
 #include "core/backend_em.h"
 #include "core/clear_context.h"
 
-
-// TURN FEATURES ON
-/**
- * @brief Enable a particular feature for use with this CryptoContextImpl
- * @param cryptoCtx - Reference to CryptoContext from JS.
- * @param pkeScheme - the feature that should be enabled
- */
-template<typename Element>
-void Enable(const CryptoContext<Element> cryptoCtx, PKESchemeFeature pkeScheme) {
-  cryptoCtx->Enable(pkeScheme);
+CryptoContext<DCRTPoly> GenCryptoContextBFV2() {
+  CCParams<CryptoContextBFVRNS> parameters;
+  parameters.SetPlaintextModulus(65537);
+  parameters.SetMultiplicativeDepth(2);
+  return GenCryptoContext(parameters);
 }
 
-/**
- * @brief KeyGen generates a key pair using this algorithm's KeyGen method.
- * @param cryptoCtx - Reference to CryptoContext from JS.
- * @return a public/secret key pair.
- */
-template<typename Element>
-KeyPair<Element> KeyGen(CryptoContext<Element> cryptoCtx) {
-  return cryptoCtx->KeyGen();
+CryptoContext<DCRTPoly> GenCryptoContextBFV(CCParams<CryptoContextBFVRNS> params){
+  return GenCryptoContext(params);
 }
 
-/**
- * @brief Generate key switch hint on a ciphertext for depth 2.
- * @param cryptoCtx - Reference to CryptoContext from JS.
- * @param secretKey is the original private key used for generating
- * ciphertext.
- */
-template<typename Element>
-void EvalMultKeyGen(const CryptoContext<Element> cryptoCtx, PrivateKey<Element> secretKey) {
-  cryptoCtx->EvalMultKeyGen(secretKey);
+CryptoContext<DCRTPoly> GenCryptoContextCKKS(CCParams<CryptoContextCKKSRNS> params) {
+  return GenCryptoContext(params);
 }
 
-/**
- * @brief constructs a PackedEncoding in this context
- * @param cryptoCtx - Reference to CryptoContext from JS.
- * @param values Vector of integers
- * @return plaintext
- */
-template<typename Element>
-Plaintext MakePackedPlaintext(const CryptoContext<Element> cryptoCtx, std::vector<int32_t> values) {
-  std::vector<int64_t> values64(values.size());
-  for (int i = 0; i < values.size(); i++) {
-    values64[i] = values[i];
-  };
-  return cryptoCtx->MakePackedPlaintext(values64);
+CryptoContext<DCRTPoly> GenCryptoContextBGV(CCParams<CryptoContextBGVRNS> params) {
+  return GenCryptoContext(params);
 }
 
 /**
@@ -440,9 +411,9 @@ emscripten::val SerializeEvalMultKeyToBuffer(const CryptoContext<Element> &crypt
   std::ostringstream outputBuffer;
 
   if (serType == JsSerType::BINARY) {
-    cryptoCtx->SerializeEvalMultKey(outputBuffer, SerType::BINARY);
+    cryptoCtx->SerializeEvalMultKey(outputBuffer, SerType::BINARY, "");
   } else if (serType == JsSerType::JSON) {
-    cryptoCtx->SerializeEvalMultKey(outputBuffer, SerType::JSON);
+    cryptoCtx->SerializeEvalMultKey(outputBuffer, SerType::JSON, "");
   }
 
   return stringstreamToTypedArray(outputBuffer);
@@ -460,9 +431,9 @@ emscripten::val SerializeEvalAutomorphismKeyToBuffer(const CryptoContext<Element
   std::ostringstream outputBuffer;
 
   if (serType == JsSerType::BINARY) {
-    cryptoCtx->SerializeEvalAutomorphismKey(outputBuffer, SerType::BINARY);
+    cryptoCtx->SerializeEvalAutomorphismKey(outputBuffer, SerType::BINARY, "");
   } else if (serType == JsSerType::JSON) {
-    cryptoCtx->SerializeEvalAutomorphismKey(outputBuffer, SerType::JSON);
+    cryptoCtx->SerializeEvalAutomorphismKey(outputBuffer, SerType::JSON, "");
   }
 
   return stringstreamToTypedArray(outputBuffer);
@@ -480,9 +451,9 @@ emscripten::val SerializeEvalSumKeyToBuffer(const CryptoContext<Element> &crypto
   std::ostringstream outputBuffer;
 
   if (serType == JsSerType::BINARY) {
-    cryptoCtx->SerializeEvalSumKey(outputBuffer, SerType::BINARY);
+    cryptoCtx->SerializeEvalSumKey(outputBuffer, SerType::BINARY, "");
   } else if (serType == JsSerType::JSON) {
-    cryptoCtx->SerializeEvalSumKey(outputBuffer, SerType::JSON);
+    cryptoCtx->SerializeEvalSumKey(outputBuffer, SerType::JSON, "");
   }
 
   return stringstreamToTypedArray(outputBuffer);
@@ -710,7 +681,13 @@ int GetPlaintextModulus(const CryptoContext<Element> &cryptoCtx) {
 }
 
 using CC = CryptoContextImpl<DCRTPoly>;
+using _CC = CryptoContext<DCRTPoly>;
 EMSCRIPTEN_BINDINGS(CryproContext) {
+
+  emscripten::function("GenCryptoContextBFV2", &GenCryptoContextBFV2);
+  emscripten::function("GenCryptoContextBFV", select_overload<_CC(CCParams<CryptoContextBFVRNS>)>(&GenCryptoContextBFV));
+  emscripten::function("GenCryptoContextCKKS", select_overload<_CC(CCParams<CryptoContextCKKSRNS>)>(&GenCryptoContextCKKS));
+  emscripten::function("GenCryptoContextBGV", select_overload<_CC(CCParams<CryptoContextBGVRNS>)>(&GenCryptoContextBGV));
 
   emscripten::register_vector<Ciphertext<DCRTPoly >>("VectorCiphertextDCRTPoly");
   emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");
