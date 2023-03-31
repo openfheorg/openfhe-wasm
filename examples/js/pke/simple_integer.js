@@ -3,23 +3,19 @@ async function main() {
     const module = await factory()
     // Set the main parameters
     // all int types are number in typescript unless defined otherwise.
-    const plaintextModulus = 65537;
-    const sigma = 3.2;
-    const depth = 2;
-    // Instantiate the crypto context (CryptoContext type doesn't exist yet)
-    // from inttypes.h, MODE: enum =  { RLWE= 0, OPTIMIZED =1, SPARSE =2};
-    // This should have a custom type (not any) when cryptoContext type is
-    // defined.
-    // cryptoContext = module.GenCryptoContextBFV();
+    const plaintextMod = 65537;
+    const multDepth = 2;
+    params = new module.CCParamsCryptoContextBFVRNS();
+    params.SetWrappedPlaintextModulus(plaintextMod);
+    console.log(`Plaintext Modulus was: ${params.GetWrappedPlaintextModulus()}`);
 
-    // params = new module.CryptoParameters_BGVRNS();
-    params = new module.CCParamsCryptoContextBGVRNS();
-    params.GetPlaintextModulus();
+    params.SetWrappedMultiplicativeDepth(multDepth);
+    console.log(`Mult Depth was: ${params.GetWrappedMultiplicativeDepth()}`);
+    // params.SetMultDepth(multDepth);
     // params = new module.CCParamsBGV();
-    cc = module.GenCryptoContextBFV2();
-    cc.Enable(module.PKESchemeFeature.PKE);
+    // cc = module.GenCryptoContextBFV2();
+    // cc.Enable(module.PKESchemeFeature.PKE);
 
-    console.log("Got past CC Creation");
     // for (let methodIdx = 0; methodIdx < 2; methodIdx++) {
     //     if (methodIdx === 0) {
     //         cryptoContext = new module.GenCryptoContextBFVrns(
@@ -121,4 +117,10 @@ async function main() {
     return 0;
 }
 
-main().then(exitCode => console.log(exitCode));
+main().then(exitCode => {
+    if (exitCode === 0){
+        console.log(`\x1b[32m`, "Finished successfully", `\x1b[0m`);
+    } else {
+        console.log(`\x1b[31m`, "Finished successfully", `\x1b[0m`);
+    }
+});
