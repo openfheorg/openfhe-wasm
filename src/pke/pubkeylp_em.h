@@ -55,9 +55,21 @@ EMSCRIPTEN_BINDINGS(pke_publey) {
   /////////////////////////////////////////////////////////////////
   class_<CCParams<CryptoContextBGVRNS>>("CryptoParameters_BGVRNS")
       .smart_ptr<std::shared_ptr<CCParams<CryptoContextBGVRNS>>>("CryptoParameters_CryptoContextBGVRNS")
+      .constructor(&std::make_shared<CCParams<CryptoContextBGVRNS>>, allow_raw_pointers())
       .function("GetPlaintextModulus", &GetWrappedPlaintextModulus<CryptoContextBGVRNS>)
       .function("toString", &GetString<CCParams<CryptoContextBGVRNS>>);
-
+//
+//  class_<CCParams<CryptoContextCKKSRNS>>("CryptoParameters")
+//      .smart_ptr<std::shared_ptr<CCParams<CryptoContextCKKSRNS>>>("CryptoParameters_CryptoContextBGVRNS")
+//      .constructor(&std::make_shared<CCParams<CryptoContextCKKSRNS>>, allow_raw_pointers())
+//      .function("GetPlaintextModulus", &GetWrappedPlaintextModulus<CryptoContextBGVRNS>)
+//      .function("toString", &GetString<CCParams<CryptoContextBGVRNS>>);
+//
+//  class_<CCParams<CryptoContextBFVRNS>>("CryptoParameters_BGVRNS")
+//      .smart_ptr<std::shared_ptr<CCParams<CryptoContextBGVRNS>>>("CryptoParameters_CryptoContextBGVRNS")
+//      .constructor(&std::make_shared<CCParams<CryptoContextBGVRNS>>, allow_raw_pointers())
+//      .function("GetPlaintextModulus", &GetWrappedPlaintextModulus<CryptoContextBGVRNS>)
+//      .function("toString", &GetString<CCParams<CryptoContextBGVRNS>>);
 }
 
 #endif

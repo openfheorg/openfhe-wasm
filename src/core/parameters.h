@@ -39,26 +39,31 @@
 //template<typename CryptoScheme>
 //lbcrypto::CCParams<CryptoScheme> crea
 
+#include "openfhe.h"
+using namespace lbcrypto;
 
 #include <emscripten.h>
 #include <emscripten/bind.h>
+using namespace emscripten;
 
 using P_BFV = CCParams<CryptoContextBFVRNS>;
 using P_BGV = CCParams<CryptoContextBGVRNS>;
 using P_CKKS = CCParams<CryptoContextCKKSRNS>;
 EMSCRIPTEN_BINDINGS(parameters) {
-  class_<P_BFV>("CCParamsFV")
+  class_<P_BFV>("CCParamsBFV")
       .constructor<>()
+      .constructor(&std::make_shared<CCParams<CryptoContextBFVRNS>>, allow_raw_pointers())
+//      .constructor(&std::make_shared<CryptoContextImpl<DCRTPoly>>, allow_raw_pointers())
       .function("SetPlaintextModulus", &P_BFV::SetPlaintextModulus)
       .function("SetMultiplicativeDepth", &P_BFV::SetMultiplicativeDepth)
       .function("SetScalingModSize", &P_BFV::SetScalingModSize)
       ;
-  class_<P_BGV>("CCParamsBGV")
-      .constructor<>()
-      .function("SetPlaintextModulus", &P_BGV::SetPlaintextModulus)
-      .function("SetMultiplicativeDepth", &P_BGV::SetMultiplicativeDepth)
-      .function("SetScalingModSize", &P_BGV::SetScalingModSize)
-      ;
+//  class_<P_BGV>("CCParamsBGV")
+//      .constructor<>()
+//      .function("SetPlaintextModulus", &P_BGV::SetPlaintextModulus)
+//      .function("SetMultiplicativeDepth", &P_BGV::SetMultiplicativeDepth)
+//      .function("SetScalingModSize", &P_BGV::SetScalingModSize)
+//      ;
 
   class_<P_CKKS>("CCParamsCKKS")
       .constructor<>()

@@ -11,6 +11,10 @@ async function main() {
     // This should have a custom type (not any) when cryptoContext type is
     // defined.
     // cryptoContext = module.GenCryptoContextBFV();
+
+    params = new module.CryptoParameters_BGVRNS();
+    params.GetPlaintextModulus();
+    // params = new module.CCParamsBGV();
     cc = module.GenCryptoContextBFV2();
     cc.Enable(module.PKESchemeFeature.PKE);
 
