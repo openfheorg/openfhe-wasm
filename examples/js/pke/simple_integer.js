@@ -12,7 +12,8 @@ async function main() {
     // defined.
     // cryptoContext = module.GenCryptoContextBFV();
 
-    params = new module.CryptoParameters_BGVRNS();
+    // params = new module.CryptoParameters_BGVRNS();
+    params = new module.CCParamsCryptoContextBGVRNS();
     params.GetPlaintextModulus();
     // params = new module.CCParamsBGV();
     cc = module.GenCryptoContextBFV2();

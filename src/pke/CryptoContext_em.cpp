@@ -20,7 +20,7 @@ using namespace emscripten;
 #include "core/exception_em.h"
 #include "core/dcrtpoly_em.h"
 #include "core/version_em.h"
-//#include "core/parameters.h"
+#include "core/parameters.h"
 #include "pubkeylp_em.h"
 #include "pke_serial_em.h"
 #include "core/backend_em.h"
@@ -33,7 +33,7 @@ CryptoContext<DCRTPoly> GenCryptoContextBFV2() {
   return GenCryptoContext(parameters);
 }
 
-CryptoContext<DCRTPoly> GenCryptoContextBFV(CCParams<CryptoContextBFVRNS> params){
+CryptoContext<DCRTPoly> GenCryptoContextBFV(CCParams<CryptoContextBFVRNS> params) {
   return GenCryptoContext(params);
 }
 
@@ -685,9 +685,12 @@ using _CC = CryptoContext<DCRTPoly>;
 EMSCRIPTEN_BINDINGS(CryproContext) {
 
   emscripten::function("GenCryptoContextBFV2", &GenCryptoContextBFV2);
-  emscripten::function("GenCryptoContextBFV", select_overload<_CC(CCParams<CryptoContextBFVRNS>)>(&GenCryptoContextBFV));
-  emscripten::function("GenCryptoContextCKKS", select_overload<_CC(CCParams<CryptoContextCKKSRNS>)>(&GenCryptoContextCKKS));
-  emscripten::function("GenCryptoContextBGV", select_overload<_CC(CCParams<CryptoContextBGVRNS>)>(&GenCryptoContextBGV));
+  emscripten::function("GenCryptoContextBFV",
+                       select_overload<_CC(CCParams<CryptoContextBFVRNS>)>(&GenCryptoContextBFV));
+  emscripten::function("GenCryptoContextCKKS",
+                       select_overload<_CC(CCParams<CryptoContextCKKSRNS>)>(&GenCryptoContextCKKS));
+  emscripten::function("GenCryptoContextBGV",
+                       select_overload<_CC(CCParams<CryptoContextBGVRNS>)>(&GenCryptoContextBGV));
 
   emscripten::register_vector<Ciphertext<DCRTPoly >>("VectorCiphertextDCRTPoly");
   emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");

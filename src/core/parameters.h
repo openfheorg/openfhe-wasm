@@ -35,42 +35,28 @@
 
 #ifndef OPENFHE_WASM_SRC_CORE_PARAMETERS_H_
 #define OPENFHE_WASM_SRC_CORE_PARAMETERS_H_
-//
-//template<typename CryptoScheme>
-//lbcrypto::CCParams<CryptoScheme> crea
 
+#include "core/wrapped.h"
 #include "openfhe.h"
-using namespace lbcrypto;
 
-#include <emscripten.h>
-#include <emscripten/bind.h>
-using namespace emscripten;
+/**
+ * @brief Getter for the plaintext modulus.
+ * @param CryptoParameters -
+ * @return The plaintext modulus.
+ */
+template<typename Element>
+uint32_t GetWrappedPlaintextModulus(const CCParams<Element> &CryptoParameters) {
+  // assume that the plaintext modulus is < 2^31
+  return (uint32_t) CryptoParameters.GetPlaintextModulus();
+}
 
-using P_BFV = CCParams<CryptoContextBFVRNS>;
-using P_BGV = CCParams<CryptoContextBGVRNS>;
-using P_CKKS = CCParams<CryptoContextCKKSRNS>;
 EMSCRIPTEN_BINDINGS(parameters) {
-  class_<P_BFV>("CCParamsBFV")
-      .constructor<>()
-      .constructor(&std::make_shared<CCParams<CryptoContextBFVRNS>>, allow_raw_pointers())
-//      .constructor(&std::make_shared<CryptoContextImpl<DCRTPoly>>, allow_raw_pointers())
-      .function("SetPlaintextModulus", &P_BFV::SetPlaintextModulus)
-      .function("SetMultiplicativeDepth", &P_BFV::SetMultiplicativeDepth)
-      .function("SetScalingModSize", &P_BFV::SetScalingModSize)
-      ;
-//  class_<P_BGV>("CCParamsBGV")
-//      .constructor<>()
-//      .function("SetPlaintextModulus", &P_BGV::SetPlaintextModulus)
-//      .function("SetMultiplicativeDepth", &P_BGV::SetMultiplicativeDepth)
-//      .function("SetScalingModSize", &P_BGV::SetScalingModSize)
-//      ;
 
-  class_<P_CKKS>("CCParamsCKKS")
-      .constructor<>()
-      .function("SetPlaintextModulus", &P_CKKS::SetPlaintextModulus)
-      .function("SetMultiplicativeDepth", &P_CKKS::SetMultiplicativeDepth)
-      .function("SetScalingModSize", &P_CKKS::SetScalingModSize)
-      ;
+  class_<CCParams<CryptoContextBGVRNS >>("CCParamsCryptoContextBGVRNS")
+      .smart_ptr<std::shared_ptr<CCParams<CryptoContextBGVRNS>>>("CCParamsCryptoContextBGVRNS")
+      .constructor(&std::make_shared<CCParams<CryptoContextBGVRNS>>, allow_raw_pointers())
+      .function("GetPlaintextModulus", &GetWrappedPlaintextModulus<CryptoContextBGVRNS>)
+      .function("toString", &GetString<CCParams<CryptoContextBGVRNS>>);
 }
 
 #endif //OPENFHE_WASM_SRC_CORE_PARAMETERS_H_
