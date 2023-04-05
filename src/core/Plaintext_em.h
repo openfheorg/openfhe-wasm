@@ -77,7 +77,7 @@ EMSCRIPTEN_BINDINGS(core) {
   enum_<PKESchemeFeature>("PKESchemeFeature")
       .value("PKE", PKE)
       .value("PRE", PRE)
-      .value("SHE", LEVELEDSHE)
+      .value("LEVELEDSHE", LEVELEDSHE)
       .value("FHE", FHE)
       .value("MULTIPARTY", MULTIPARTY)
       .value("ADVANCEDSHE", ADVANCEDSHE);

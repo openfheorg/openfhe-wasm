@@ -33,7 +33,7 @@ CryptoContext<DCRTPoly> GenCryptoContextBFV2() {
   return GenCryptoContext(parameters);
 }
 
-CryptoContext<DCRTPoly> GenCryptoContextBFV(CCParams<CryptoContextBFVRNS> params){
+CryptoContext<DCRTPoly> GenCryptoContextBFV(CCParams<CryptoContextBFVRNS> params) {
   return GenCryptoContext(params);
 }
 
@@ -58,6 +58,26 @@ CryptoContext<DCRTPoly> GenCryptoContextBGV(CCParams<CryptoContextBGVRNS> params
 template<typename Element>
 Plaintext MakeCKKSPackedPlaintext(const CryptoContext<Element> cryptoCtx, std::vector<double> values) {
   return cryptoCtx->MakeCKKSPackedPlaintext(values);
+}
+
+/**
+ * @brief constructs a CKKSPackedEncoding in this context
+ * from a vector of real numbers
+ * @param cryptoCtx - Reference to CryptoContext from JS.
+ * @param values - input vector of doubles.
+ * @param depth - depth used to encode the vector.
+ * @param level (default) - level at each the vector will get encrypted.
+ * @param params (default) - parameters to be used for the ciphertext.
+ * @return plaintext
+ */
+template<typename Element>
+Plaintext MakePackedPlaintext(
+    const CryptoContext<Element> cryptoCtx,
+    std::vector<double> values,
+    size_t depth = 1,
+    uint32_t level = 0
+) {
+  return cryptoCtx->MakeCKKSPackedPlaintext(values, depth, level);
 }
 
 /**
@@ -681,13 +701,13 @@ int GetPlaintextModulus(const CryptoContext<Element> &cryptoCtx) {
 }
 
 using CC = CryptoContextImpl<DCRTPoly>;
-using _CC = CryptoContext<DCRTPoly>;
+using CC_prime = CryptoContext<DCRTPoly>;
 EMSCRIPTEN_BINDINGS(CryproContext) {
 
   emscripten::function("GenCryptoContextBFV2", &GenCryptoContextBFV2);
-  emscripten::function("GenCryptoContextBFV", select_overload<_CC(CCParams<CryptoContextBFVRNS>)>(&GenCryptoContextBFV));
-  emscripten::function("GenCryptoContextCKKS", select_overload<_CC(CCParams<CryptoContextCKKSRNS>)>(&GenCryptoContextCKKS));
-  emscripten::function("GenCryptoContextBGV", select_overload<_CC(CCParams<CryptoContextBGVRNS>)>(&GenCryptoContextBGV));
+  emscripten::function("GenCryptoContextBFV", select_overload<CC_prime(CCP_BFV)>(&GenCryptoContextBFV));
+  emscripten::function("GenCryptoContextCKKS", select_overload<CC_prime(CCP_CKKS)>(&GenCryptoContextCKKS));
+  emscripten::function("GenCryptoContextBGV", select_overload<CC_prime(CCP_BGV)>(&GenCryptoContextBGV));
 
   emscripten::register_vector<Ciphertext<DCRTPoly >>("VectorCiphertextDCRTPoly");
   emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");
@@ -727,7 +747,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .function("EvalAtIndexKeyGen", &CC::EvalAtIndexKeyGen)
           // 2 args
       .function("EvalAtIndexKeyGen", &EvalAtIndexKeyGen<DCRTPoly>)
-      .function("MakePackedPlaintext", &CC::MakePackedPlaintext)
+      .function("MakePackedPlaintext", &MakePackedPlaintext<DCRTPoly>)
       .function("MakeCKKSPackedPlaintext", &MakeCKKSPackedPlaintext<DCRTPoly>)
           // select_overload() required because the other overload is deprecated
       .function("ReEncrypt", &ReEncrypt2<DCRTPoly>)

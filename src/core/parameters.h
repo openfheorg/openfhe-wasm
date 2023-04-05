@@ -97,10 +97,10 @@ EMSCRIPTEN_BINDINGS(parameters) {
   class_<CCP_BFV>("CCParamsCryptoContextBFVRNS")
       .smart_ptr<std::shared_ptr<CCP_BFV>>("CCParamsCryptoContextBFVRNS")
       .constructor(&std::make_shared<CCP_BFV>, allow_raw_pointers())
-      .function("GetWrappedPlaintextModulus", &GetWrappedPlaintextModulus<BFV>)
-      .function("SetWrappedPlaintextModulus", &SetWrappedPlaintextModulus<BFV>)
-      .function("GetWrappedMultiplicativeDepth", &GetWrappedMultiplicativeDepth<BFV>)
-      .function("SetWrappedMultiplicativeDepth", &SetWrappedMultiplicativeDepth<BFV>)
+      .function("GetPlaintextModulus", &GetWrappedPlaintextModulus<BFV>)
+      .function("SetPlaintextModulus", &SetWrappedPlaintextModulus<BFV>)
+      .function("GetMultiplicativeDepth", &GetWrappedMultiplicativeDepth<BFV>)
+      .function("SetMultiplicativeDepth", &SetWrappedMultiplicativeDepth<BFV>)
       .function("toString", &GetString<CCP_BFV>);
 
 //
