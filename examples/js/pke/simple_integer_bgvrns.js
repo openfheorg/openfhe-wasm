@@ -19,13 +19,13 @@ async function main() {
     // all int types are number in typescript unless defined otherwise.
     const plaintextMod = 65537;
     const multDepth = 2;
-    let params = new module.CCParamsCryptoContextBFVRNS();
+    let params = new module.CCParamsCryptoContextBGVRNS();
     params.SetPlaintextModulus(plaintextMod);
     console.log(`Plaintext Modulus was: ${params.GetPlaintextModulus()}`);
 
     params.SetMultiplicativeDepth(multDepth);
     console.log(`Mult Depth was: ${params.GetMultiplicativeDepth()}`);
-    let cc = new module.GenCryptoContextBFV(params);
+    let cc = new module.GenCryptoContextBGV(params);
 
     cc.Enable(module.PKESchemeFeature.PKE);
     cc.Enable(module.PKESchemeFeature.LEVELEDSHE);

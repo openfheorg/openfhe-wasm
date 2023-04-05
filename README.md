@@ -22,6 +22,9 @@ schemes supported by OpenFHE and exposes an API similar to the C++ API for OpenF
 1. Install `emscripten` using the instructions at https://emscripten.org/docs/getting_started/downloads.html.
 2. Install `NodeJs` if not already installed.
 3. Clone [OpenFHE-development](https://github.com/openfheorg/openfhe-development) @TODO: once OpenFHE repo (stable version)
+
+- **NOTE: As of 04/05/2023, only the `dev` branch works for the moment. If you see an issue about the math backend not being specified, make sure you're on the right branch**
+
 4. `cd` into the cloned directory and create `embuild` directory.
 5. Run
 
