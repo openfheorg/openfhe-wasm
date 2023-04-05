@@ -87,6 +87,22 @@ void SetWrappedMultiplicativeDepth(
   CryptoParameters.SetMultiplicativeDepth(as32t);
 }
 
+template<typename Scheme>
+void SetSecurityLevel(
+    CCParams<Scheme> &CryptoParameters,
+    SecurityLevel security
+    ){
+  CryptoParameters.SetSecurityLevel(security);
+}
+
+template<typename Scheme>
+void SetRingDim(
+    CCParams<Scheme> &CryptoParameters,
+    usint ringDim
+) {
+  CryptoParameters.SetRingDim(ringDim);
+}
+
 using CKKS = CryptoContextCKKSRNS;
 using CCP_CKKS = CCParams<CKKS>;
 using BFV = CryptoContextBFVRNS;
@@ -101,6 +117,8 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetPlaintextModulus", &SetWrappedPlaintextModulus<BFV>)
       .function("GetMultiplicativeDepth", &GetWrappedMultiplicativeDepth<BFV>)
       .function("SetMultiplicativeDepth", &SetWrappedMultiplicativeDepth<BFV>)
+      .function("SetSecurityLevel",&SetSecurityLevel<BFV>)
+      .function("SetRingDim", &SetRingDim<BFV>)
       .function("toString", &GetString<CCP_BFV>);
 
 
@@ -111,6 +129,8 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetPlaintextModulus", &SetWrappedPlaintextModulus<BGV>)
       .function("GetMultiplicativeDepth", &GetWrappedMultiplicativeDepth<BGV>)
       .function("SetMultiplicativeDepth", &SetWrappedMultiplicativeDepth<BGV>)
+      .function("SetSecurityLevel", &SetSecurityLevel<BGV>)
+      .function("SetRingDim", &SetRingDim<BGV>)
       .function("toString", &GetString<CCP_BGV>);
 
 //  class_<CCP_CKKS>("CCParamsCryptoContextCKKSRNS")

@@ -1,6 +1,16 @@
 # OpenFHE-WASM
 WASM Port of OPENFHE Wasm
 
+# Table of Contents
+- [Installing OpenFHE-WASM](#build-instructions)
+  - [TODO: Install from NPM](#from-npm)
+  - [Building From Source](#building-from-source)
+    - [Installing OpenFHE](#build-the-openfhe-library-with-emscripten)
+    - [Installing OpenFHE-WASM](#building-openfhe-wasm)
+  - [Running OpenFHE-WASM](#running-web-assembly-unit-tests) 
+    - TODO
+  - [Sharp Edges](#sharp-edges)
+
 # General information
 
 `openfhe-wasm` is the official web-assembly port of
@@ -73,3 +83,9 @@ This should install emscripten libraries in `openfhe-wasm/lib` directory.
 # Notes specific to openfhe-wasm
 
 # Examples
+
+# Sharp Edges 
+
+Note that there have been a few notable differences from the original [PALISADE-WASM](https://gitlab.com/palisade/palisade-wasm/)
+
+- `cc.MakePackedPlaintext` now requires the user to specify both the vector to pack, the depth, and the level. Previously only the first argument was necessary
