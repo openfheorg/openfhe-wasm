@@ -2,7 +2,7 @@
 #define _OPENFHEWEB_PKE_SERIAL_EM_H
 
 #include "core/serial_em.h"
-
+#include "globals.h"
 using namespace lbcrypto;
 
 /**
@@ -47,6 +47,9 @@ EMSCRIPTEN_BINDINGS(serial) {
   emscripten::function("DeserializePublicKeyFromBuffer", &DeserializeFromBuffer<PublicKey<DCRTPoly>>);
   emscripten::function("DeserializePrivateKeyFromBuffer", &DeserializeFromBuffer<PrivateKey<DCRTPoly>>);
   emscripten::function("DeserializeCiphertextFromBuffer", &DeserializeFromBuffer<Ciphertext<DCRTPoly>>);
+  emscripten::function("PrecomputeCRTTablesAfterDeserializaton", &PrecomputeCRTTablesAfterDeserializaton);
+  emscripten::function("EnablePrecomputeCRTTablesAfterDeserializaton", &EnablePrecomputeCRTTablesAfterDeserializaton);
+  emscripten::function("DisablePrecomputeCRTTablesAfterDeserializaton", &DisablePrecomputeCRTTablesAfterDeserializaton);
 }
 
 #endif

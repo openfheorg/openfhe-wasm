@@ -1,6 +1,16 @@
 # OpenFHE-WASM
 WASM Port of OPENFHE Wasm
 
+# Table of Contents
+- [Installing OpenFHE-WASM](#build-instructions)
+  - [TODO: Install from NPM](#from-npm)
+  - [Building From Source](#building-from-source)
+    - [Installing OpenFHE](#build-the-openfhe-library-with-emscripten)
+    - [Installing OpenFHE-WASM](#building-openfhe-wasm)
+  - [Running OpenFHE-WASM](#running-web-assembly-unit-tests) 
+    - TODO
+  - [Sharp Edges](#sharp-edges)
+
 # General information
 
 `openfhe-wasm` is the official web-assembly port of
@@ -22,6 +32,9 @@ schemes supported by OpenFHE and exposes an API similar to the C++ API for OpenF
 1. Install `emscripten` using the instructions at https://emscripten.org/docs/getting_started/downloads.html.
 2. Install `NodeJs` if not already installed.
 3. Clone [OpenFHE-development](https://github.com/openfheorg/openfhe-development) @TODO: once OpenFHE repo (stable version)
+
+- **NOTE: As of 04/05/2023, only the `dev` branch works for the moment. If you see an issue about the math backend not being specified, make sure you're on the right branch**
+
 4. `cd` into the cloned directory and create `embuild` directory.
 5. Run
 
@@ -70,3 +83,9 @@ This should install emscripten libraries in `openfhe-wasm/lib` directory.
 # Notes specific to openfhe-wasm
 
 # Examples
+
+# Sharp Edges 
+
+Note that there have been a few notable differences from the original [PALISADE-WASM](https://gitlab.com/palisade/palisade-wasm/)
+
+- `cc.MakePackedPlaintext` now requires the user to specify both the vector to pack, the depth, and the level. Previously only the first argument was necessary

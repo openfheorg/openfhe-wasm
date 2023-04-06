@@ -87,6 +87,22 @@ void SetWrappedMultiplicativeDepth(
   CryptoParameters.SetMultiplicativeDepth(as32t);
 }
 
+template<typename Scheme>
+void SetSecurityLevel(
+    CCParams<Scheme> &CryptoParameters,
+    SecurityLevel security
+    ){
+  CryptoParameters.SetSecurityLevel(security);
+}
+
+template<typename Scheme>
+void SetRingDim(
+    CCParams<Scheme> &CryptoParameters,
+    usint ringDim
+) {
+  CryptoParameters.SetRingDim(ringDim);
+}
+
 using CKKS = CryptoContextCKKSRNS;
 using CCP_CKKS = CCParams<CKKS>;
 using BFV = CryptoContextBFVRNS;
@@ -101,18 +117,22 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetPlaintextModulus", &SetWrappedPlaintextModulus<BFV>)
       .function("GetMultiplicativeDepth", &GetWrappedMultiplicativeDepth<BFV>)
       .function("SetMultiplicativeDepth", &SetWrappedMultiplicativeDepth<BFV>)
+      .function("SetSecurityLevel",&SetSecurityLevel<BFV>)
+      .function("SetRingDim", &SetRingDim<BFV>)
       .function("toString", &GetString<CCP_BFV>);
 
-//
-//  class_<CCP_BGV>("CCParamsCryptoContextBGVRNS")
-//      .smart_ptr<std::shared_ptr<CCP_BGV>>("CCParamsCryptoContextBGVRNS")
-//      .constructor(&std::make_shared<CCP_BGV>, allow_raw_pointers())
-//      .function("GetWrappedPlaintextModulus", &GetWrappedPlaintextModulus<BGV>)
-//      .function("SetWrappedPlaintextModulus", &SetWrappedPlaintextModulus<BGV>)
-//      .function("GetWrappedMultiplicativeDepth", &GetMultiplicativeDepth<BGV>)
-//      .function("SetWrappedPlaintextModulus", &SetMultiplicativeDepth<BGV>)
-//      .function("toString", &GetString<CCP_BGV>);
-//
+
+  class_<CCP_BGV>("CCParamsCryptoContextBGVRNS")
+      .smart_ptr<std::shared_ptr<CCP_BGV>>("CCParamsCryptoContextBGVRNS")
+      .constructor(&std::make_shared<CCP_BGV>, allow_raw_pointers())
+      .function("GetPlaintextModulus", &GetWrappedPlaintextModulus<BGV>)
+      .function("SetPlaintextModulus", &SetWrappedPlaintextModulus<BGV>)
+      .function("GetMultiplicativeDepth", &GetWrappedMultiplicativeDepth<BGV>)
+      .function("SetMultiplicativeDepth", &SetWrappedMultiplicativeDepth<BGV>)
+      .function("SetSecurityLevel", &SetSecurityLevel<BGV>)
+      .function("SetRingDim", &SetRingDim<BGV>)
+      .function("toString", &GetString<CCP_BGV>);
+
 //  class_<CCP_CKKS>("CCParamsCryptoContextCKKSRNS")
 //      .smart_ptr<std::shared_ptr<CCP_CKKS>>("CCParamsCryptoContextCKKSRNS")
 //      .constructor(&std::make_shared<CCP_CKKS>, allow_raw_pointers())

@@ -73,11 +73,11 @@ Plaintext MakeCKKSPackedPlaintext(const CryptoContext<Element> cryptoCtx, std::v
 template<typename Element>
 Plaintext MakePackedPlaintext(
     const CryptoContext<Element> cryptoCtx,
-    std::vector<double> values,
+    std::vector<int64_t> values,
     size_t depth = 1,
     uint32_t level = 0
 ) {
-  return cryptoCtx->MakeCKKSPackedPlaintext(values, depth, level);
+  return cryptoCtx->MakePackedPlaintext(values, depth, level);
 }
 
 /**
