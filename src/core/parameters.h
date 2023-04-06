@@ -108,7 +108,7 @@ void SetScalingModSize(
     CCParams<Scheme> &CryptoParameters,
     uint32_t scalingModSize
 ) {
-  CryptoParameters.SetRingDim(scalingModSize);
+  CryptoParameters.SetScalingModSize(scalingModSize);
 }
 
 template<typename Scheme>
@@ -116,7 +116,7 @@ void SetBatchSize(
     CCParams<Scheme> &CryptoParameters,
     uint32_t batchSize
 ) {
-  CryptoParameters.SetRingDim(batchSize);
+  CryptoParameters.SetBatchSize(batchSize);
 }
 
 using CKKS = CryptoContextCKKSRNS;

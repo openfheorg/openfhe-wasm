@@ -31,9 +31,8 @@ async function main() {
 
     params.SetMultiplicativeDepth(multDepth);
     params.SetSecurityLevel(securityLevel);
-    parames.SetScalingModSize(scalingModSize);
-    parames.SetBatchSize(batchSize);
-    console.log(`Mult Depth was: ${params.GetMultiplicativeDepth()}`);
+    params.SetScalingModSize(scalingModSize);
+    params.SetBatchSize(batchSize);
     let cc = new module.GenCryptoContextCKKS(params);
     cc.Enable(module.PKESchemeFeature.PKE);
     cc.Enable(module.PKESchemeFeature.KEYSWITCH);
@@ -41,8 +40,9 @@ async function main() {
 
     console.log(`CKKS scheme is using ring dimension ${cc.GetRingDimension()}\n`)
 
-    cc.Enable(module.PKESchemeFeature.ENCRYPTION);
-    cc.Enable(module.PKESchemeFeature.SHE);
+    cc.Enable(module.PKESchemeFeature.PKE);
+    cc.Enable(module.PKESchemeFeature.LEVELEDSHE);
+    cc.Enable(module.PKESchemeFeature.KEYSWITCH);
 
     // Step 2: Key Generation
     const keys = cc.KeyGen();
