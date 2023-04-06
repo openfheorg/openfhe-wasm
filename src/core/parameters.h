@@ -103,6 +103,22 @@ void SetRingDim(
   CryptoParameters.SetRingDim(ringDim);
 }
 
+template<typename Scheme>
+void SetScalingModSize(
+    CCParams<Scheme> &CryptoParameters,
+    uint32_t scalingModSize
+) {
+  CryptoParameters.SetRingDim(scalingModSize);
+}
+
+template<typename Scheme>
+void SetBatchSize(
+    CCParams<Scheme> &CryptoParameters,
+    uint32_t batchSize
+) {
+  CryptoParameters.SetRingDim(batchSize);
+}
+
 using CKKS = CryptoContextCKKSRNS;
 using CCP_CKKS = CCParams<CKKS>;
 using BFV = CryptoContextBFVRNS;
@@ -119,6 +135,8 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetMultiplicativeDepth", &SetWrappedMultiplicativeDepth<BFV>)
       .function("SetSecurityLevel",&SetSecurityLevel<BFV>)
       .function("SetRingDim", &SetRingDim<BFV>)
+      .function("SetScalingModSize", &SetScalingModSize<BFV>)
+      .function("SetBatchSize", &SetBatchSize<BFV>)
       .function("toString", &GetString<CCP_BFV>);
 
 
@@ -131,18 +149,22 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetMultiplicativeDepth", &SetWrappedMultiplicativeDepth<BGV>)
       .function("SetSecurityLevel", &SetSecurityLevel<BGV>)
       .function("SetRingDim", &SetRingDim<BGV>)
+      .function("SetScalingModSize", &SetScalingModSize<BGV>)
+      .function("SetBatchSize", &SetBatchSize<BGV>)
       .function("toString", &GetString<CCP_BGV>);
 
-//  class_<CCP_CKKS>("CCParamsCryptoContextCKKSRNS")
-//      .smart_ptr<std::shared_ptr<CCP_CKKS>>("CCParamsCryptoContextCKKSRNS")
-//      .constructor(&std::make_shared<CCP_CKKS>, allow_raw_pointers())
-//      .function("GetPlaintextModulus", &GetPlaintextModulus<CKKS>)
-//      .function("SetPlaintextModulus", &SetPlaintextModulus<CKKS>)
-//      .function("GetMultiplicativeDepth", &GetMultiplicativeDepth<CKKS>)
-//      .function("SetPlaintextModulus", &SetMultiplicativeDepth<CKKS>)
-//      .function("toString", &GetString<CCP_CKKS>);
-//
-
+  class_<CCP_CKKS>("CCParamsCryptoContextCKKSRNS")
+      .smart_ptr<std::shared_ptr<CCP_CKKS>>("CCParamsCryptoContextCKKSRNS")
+      .constructor(&std::make_shared<CCP_CKKS>, allow_raw_pointers())
+      .function("GetPlaintextModulus", &GetWrappedPlaintextModulus<CKKS>)
+      .function("SetPlaintextModulus", &SetWrappedPlaintextModulus<CKKS>)
+      .function("GetMultiplicativeDepth", &GetWrappedMultiplicativeDepth<CKKS>)
+      .function("SetMultiplicativeDepth", &SetWrappedMultiplicativeDepth<CKKS>)
+      .function("SetSecurityLevel", &SetSecurityLevel<CKKS>)
+      .function("SetRingDim", &SetRingDim<CKKS>)
+      .function("SetScalingModSize", &SetScalingModSize<CKKS>)
+      .function("SetBatchSize", &SetBatchSize<CKKS>)
+      .function("toString", &GetString<CCP_CKKS>);
 }
 
 #endif //OPENFHE_WASM_SRC_CORE_PARAMETERS_H_
