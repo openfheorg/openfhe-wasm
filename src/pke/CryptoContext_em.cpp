@@ -700,6 +700,21 @@ int GetPlaintextModulus(const CryptoContext<Element> &cryptoCtx) {
   return cryptoCtx->GetEncodingParams()->GetPlaintextModulus();
 }
 
+template<typename Element>
+EvalKey<Element> ReKeyGenWrapped(const CryptoContext<Element> &cc,
+                                 const PrivateKey<Element> priv,
+                                 const PublicKey<Element> pub) {
+  return cc->ReKeyGen(priv, pub);
+}
+
+template<typename Element>
+EvalKey<Element> ReKeyGenWrappedTwo(const CryptoContext<Element> &cc,
+                                    const PublicKey<Element> pub,
+                                    const PrivateKey<Element> priv
+) {
+  return cc->ReKeyGen(priv, pub);
+}
+
 using CC = CryptoContextImpl<DCRTPoly>;
 using CC_prime = CryptoContext<DCRTPoly>;
 EMSCRIPTEN_BINDINGS(CryproContext) {
@@ -782,5 +797,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .function("SerializeEvalSumKeyToBuffer", &SerializeEvalSumKeyToBuffer<DCRTPoly>)
       .function("DeserializeEvalMultKeyFromBuffer", &DeserializeEvalMultKeyFromBuffer<DCRTPoly>)
       .function("DeserializeEvalAutomorphismKeyFromBuffer", &DeserializeEvalAutomorphismKeyFromBuffer<DCRTPoly>)
-      .function("DeserializeEvalSumKeyFromBuffer", &DeserializeEvalSumKeyFromBuffer<DCRTPoly>);
+      .function("DeserializeEvalSumKeyFromBuffer", &DeserializeEvalSumKeyFromBuffer<DCRTPoly>)
+      .function("ReKeyGenPrivPub", &ReKeyGenWrapped<DCRTPoly>)
+      .function("ReKeyGenPubPriv", &ReKeyGenWrappedTwo<DCRTPoly>);
 }

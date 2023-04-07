@@ -1,4 +1,7 @@
+# ⚠️ This is still a WIP and the API is subject to change ⚠️
+
 # OpenFHE-WASM
+
 WASM Port of OPENFHE Wasm
 
 # Table of Contents
