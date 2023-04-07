@@ -45,7 +45,7 @@ async function main() {
             .GetCryptoParameters().GetElementParams().GetModulus()
             .ConvertToDouble()));
 
-    console.log(`r = ${cc.GetCryptoParameters().GetRelinWindow()}`)
+    console.log(`r = ${cc.GetCryptoParameters().GetDigitSize()}`)
 
     const ringsize = cc.GetRingDimension();
     console.log(`Alice can encrypt ${ringsize * 2} bytes of data`)
@@ -73,7 +73,7 @@ async function main() {
     for (let i = 0; i < nshort; i++) vShortsJs.push(rand() % 65536);
     const vShorts = module.MakeVectorInt64Clipped(vShortsJs);
 
-    const pt = cc.MakePackedPlaintext(vShorts);
+    const pt = cc.MakePackedPlaintext(vShorts, 1, 0);
 
     ////////////////////////////////////////////////////////////
     // Encryption
@@ -117,8 +117,9 @@ async function main() {
     console.log("\nGenerating proxy re-encryption key...");
 
     t = now();
-    const reencryptionKey12 = cc.ReKeyGen(
-        keyPair2.publicKey, keyPair1.secretKey);
+    const reencryptionKey12 = cc.ReKeyGenPrivPub(
+        keyPair1.secretKey,
+        keyPair2.publicKey);
 
     console.log(`Key generation time: \t${now() - t} ms`)
 
