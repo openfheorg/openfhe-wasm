@@ -91,7 +91,7 @@ template<typename Scheme>
 void SetSecurityLevel(
     CCParams<Scheme> &CryptoParameters,
     SecurityLevel security
-    ){
+) {
   CryptoParameters.SetSecurityLevel(security);
 }
 
@@ -119,6 +119,23 @@ void SetBatchSize(
   CryptoParameters.SetBatchSize(batchSize);
 }
 
+template<typename Scheme>
+void SetScalingTechnique(
+    CCParams<Scheme> &CryptoParameters,
+    ScalingTechnique st
+
+) {
+  CryptoParameters.SetScalingTechnique(st);
+}
+template<typename Scheme>
+void SetKeySwitchTechnique(
+    CCParams<Scheme> &CryptoParameters,
+    KeySwitchTechnique kt
+
+) {
+  CryptoParameters.SetKeySwitchTechnique(kt);
+}
+
 using CKKS = CryptoContextCKKSRNS;
 using CCP_CKKS = CCParams<CKKS>;
 using BFV = CryptoContextBFVRNS;
@@ -134,12 +151,13 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetPlaintextModulus", &SetWrappedPlaintextModulus<BFV>)
       .function("GetMultiplicativeDepth", &GetWrappedMultiplicativeDepth<BFV>)
       .function("SetMultiplicativeDepth", &SetWrappedMultiplicativeDepth<BFV>)
-      .function("SetSecurityLevel",&SetSecurityLevel<BFV>)
+      .function("SetSecurityLevel", &SetSecurityLevel<BFV>)
       .function("SetRingDim", &SetRingDim<BFV>)
       .function("SetScalingModSize", &SetScalingModSize<BFV>)
       .function("SetBatchSize", &SetBatchSize<BFV>)
+      .function("SetScalingTechnique", &SetScalingTechnique<BFV>)
+      .function("SetKeySwitchTechnique", &SetKeySwitchTechnique<BFV>)
       .function("toString", &GetString<CCP_BFV>);
-
 
   class_<CCP_BGV>("CCParamsCryptoContextBGVRNS")
       .smart_ptr<std::shared_ptr<CCP_BGV>>("CCParamsCryptoContextBGVRNS")
@@ -152,6 +170,8 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetRingDim", &SetRingDim<BGV>)
       .function("SetScalingModSize", &SetScalingModSize<BGV>)
       .function("SetBatchSize", &SetBatchSize<BGV>)
+      .function("SetScalingTechnique", &SetScalingTechnique<BGV>)
+      .function("SetKeySwitchTechnique", &SetKeySwitchTechnique<BGV>)
       .function("toString", &GetString<CCP_BGV>);
 
   class_<CCP_CKKS>("CCParamsCryptoContextCKKSRNS")
@@ -165,6 +185,8 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetRingDim", &SetRingDim<CKKS>)
       .function("SetScalingModSize", &SetScalingModSize<CKKS>)
       .function("SetBatchSize", &SetBatchSize<CKKS>)
+      .function("SetScalingTechnique", &SetScalingTechnique<CKKS>)
+      .function("SetKeySwitchTechnique", &SetKeySwitchTechnique<CKKS>)
       .function("toString", &GetString<CCP_CKKS>);
 }
 
