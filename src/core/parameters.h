@@ -126,6 +126,7 @@ using CCP_BFV = CCParams<BFV>;
 using BGV = CryptoContextBGVRNS;
 using CCP_BGV = CCParams<BGV>;
 EMSCRIPTEN_BINDINGS(parameters) {
+
   class_<CCP_BFV>("CCParamsCryptoContextBFVRNS")
       .smart_ptr<std::shared_ptr<CCP_BFV>>("CCParamsCryptoContextBFVRNS")
       .constructor(&std::make_shared<CCP_BFV>, allow_raw_pointers())

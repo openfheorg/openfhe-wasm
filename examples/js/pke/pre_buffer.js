@@ -32,7 +32,7 @@ async function main() {
     cc.Enable(module.PKESchemeFeature.LEVELEDSHE);
 
     let bla = cc.GetCryptoParameters();
-    let blabla = bla.GetPlaintextModulus()
+    let blabla = bla.GetPlaintextModulus();
     console.log(`p = ${cc.GetCryptoParameters().GetPlaintextModulus()}`)
     console.log("n = " +
         cc
