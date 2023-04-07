@@ -28,7 +28,7 @@ async function main() {
     let cc = new module.GenCryptoContextBFV(params);
 
     cc.Enable(module.PKESchemeFeature.PKE);
-    cc.Enable(module.PKESchemeFeature.KEYSWITCH);
+    cc.Enable(module.PKESchemeFeature.PRE);
     cc.Enable(module.PKESchemeFeature.LEVELEDSHE);
 
     let keyPair = cc.KeyGen();

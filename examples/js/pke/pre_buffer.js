@@ -9,24 +9,30 @@ const INT_MAX = 2 << 32 - 1;
 const rand = () => Math.floor(Math.random() * INT_MAX)
 
 async function main() {
-    const module = await require('../../../lib/openfhe_pke')()
 
-    console.log("setting up BFV RNS crypto system")
-    const plaintextModulus = 65537;
-
+    const factory = require('../../../lib/openfhe_pke')
+    const module = await factory()
+    // Set the main parameters
+    // all int types are number in typescript unless defined otherwise.
+    const plaintextMod = 65537;
     const multDepth = 1;
+    const scalingModSize = 60;
+    let params = new module.CCParamsCryptoContextBFVRNS();
+    params.SetPlaintextModulus(plaintextMod);
+    console.log(`Plaintext Modulus was: ${params.GetPlaintextModulus()}`);
 
-    const sigma = 3.2;
-    const securityLevel = module.SecurityLevel.HEStd_128_classic;
+    params.SetMultiplicativeDepth(multDepth);
+    params.SetScalingModSize(scalingModSize);
+    console.log(`Mult Depth was: ${params.GetMultiplicativeDepth()}`);
+    let cc = new module.GenCryptoContextBFV(params);
 
-    const cc = module.GenCryptoContextBFVrns(
-        plaintextModulus, securityLevel, sigma, 0, multDepth, 0,
-        module.MODE.OPTIMIZED);
-
-    cc.Enable(module.PKESchemeFeature.ENCRYPTION);
-    cc.Enable(module.PKESchemeFeature.SHE);
+    cc.Enable(module.PKESchemeFeature.PKE);
     cc.Enable(module.PKESchemeFeature.PRE);
+    cc.Enable(module.PKESchemeFeature.KEYSWITCH);
+    cc.Enable(module.PKESchemeFeature.LEVELEDSHE);
 
+    let bla = cc.GetCryptoParameters();
+    let blabla = bla.GetPlaintextModulus()
     console.log(`p = ${cc.GetCryptoParameters().GetPlaintextModulus()}`)
     console.log("n = " +
         cc

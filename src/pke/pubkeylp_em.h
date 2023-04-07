@@ -11,6 +11,11 @@ std::string GetEncodingType(const CiphertextImpl<Element> &ciphertext) {
   return ss.str();
 }
 
+template<typename Element>
+uint32_t GetWrappedPlaintextModulus(const CryptoParametersBase<Element> &lpCryptoParameters) {
+  // assume that the plaintext modulus is < 2^31
+  return (uint32_t ) lpCryptoParameters.GetPlaintextModulus();
+}
 EMSCRIPTEN_BINDINGS(pke_publey) {
   class_<CryptoObject<DCRTPoly >>("CryptoObject_DCRTPoly")
       .function("GetKeyTag", &CryptoObject<DCRTPoly>::GetKeyTag)
@@ -28,10 +33,16 @@ EMSCRIPTEN_BINDINGS(pke_publey) {
       .function("GetEncodingType", &GetEncodingType<DCRTPoly>)
       .function("toString", &GetString<CiphertextImpl<DCRTPoly>>);
 
+//  class_<CryptoParametersBase<DCRTPoly>, base<CryptoObject<DCRTPoly>>>("Parameters")
+//      .smart_ptr<std::shared_ptr<CryptoParametersBase<DCRTPoly>>>("Parameters")
+  class_<CryptoParametersBase<DCRTPoly>>("CryptoParameters_DCRTPoly")
+      .smart_ptr < std::shared_ptr < CryptoParametersBase<DCRTPoly>>>("CryptoParameters_DCRTPoly")
+      .function("GetElementParams", &CryptoParametersBase<DCRTPoly>::GetElementParams)
+//      .function("GetPlaintextModulus", &GetWrappedPlaintextModulus<DCRTPoly>)
+      .function("GetDigitSize", &CryptoParametersBase<DCRTPoly>::GetDigitSize)
+      .function("toString", &GetString<CryptoParametersBase< DCRTPoly>>);
 
-  /////////////////////////////////////////////////////////////////
-  //Non-Cryptoparams
-  /////////////////////////////////////////////////////////////////
+
   class_<KeyPair<DCRTPoly>>("KeyPair_DCRTPoly")
       .function("good", &KeyPair<DCRTPoly>::good)
       .property("secretKey", &KeyPair<DCRTPoly>::secretKey)
