@@ -9,5 +9,5 @@ update the main readme to include:
 
 ## Code
 
-- [ ] `GetRelinWindow`
-- [ ] `ReKeyGen`
+- [X] `GetRelinWindow`
+- [x] `ReKeyGen`
