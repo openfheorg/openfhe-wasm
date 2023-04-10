@@ -8,3 +8,7 @@ update the main readme to include:
 - [ ] sharp edges as they come up
 
 ## Code
+
+- [ ] Threshold FHE examples:
+  - [ ] BGV
+  - [ ] CKKS

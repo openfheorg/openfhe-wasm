@@ -131,11 +131,17 @@ template<typename Scheme>
 void SetKeySwitchTechnique(
     CCParams<Scheme> &CryptoParameters,
     KeySwitchTechnique kt
-
 ) {
   CryptoParameters.SetKeySwitchTechnique(kt);
 }
 
+template<typename Scheme>
+void SetMultipartyMode(
+    CCParams<Scheme> &CryptoParameters,
+    MultipartyMode mm
+) {
+  CryptoParameters.SetMultipartyMode(mm);
+}
 using CKKS = CryptoContextCKKSRNS;
 using CCP_CKKS = CCParams<CKKS>;
 using BFV = CryptoContextBFVRNS;
@@ -143,6 +149,12 @@ using CCP_BFV = CCParams<BFV>;
 using BGV = CryptoContextBGVRNS;
 using CCP_BGV = CCParams<BGV>;
 EMSCRIPTEN_BINDINGS(parameters) {
+
+  // Enumerations
+  enum_<MultipartyMode>("MultipartyMode")
+      .value("INVALID_MULTIPARTY_MODE", INVALID_MULTIPARTY_MODE)
+      .value("FIXED_NOISE_MULTIPARTY", FIXED_NOISE_MULTIPARTY)
+      .value("NOISE_FLOODING_MULTIPARTY", NOISE_FLOODING_MULTIPARTY);
 
   class_<CCP_BFV>("CCParamsCryptoContextBFVRNS")
       .smart_ptr<std::shared_ptr<CCP_BFV>>("CCParamsCryptoContextBFVRNS")
@@ -157,6 +169,7 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetBatchSize", &SetBatchSize<BFV>)
       .function("SetScalingTechnique", &SetScalingTechnique<BFV>)
       .function("SetKeySwitchTechnique", &SetKeySwitchTechnique<BFV>)
+      .function("SetMultipartyMode", &SetMultipartyMode<BFV>)
       .function("toString", &GetString<CCP_BFV>);
 
   class_<CCP_BGV>("CCParamsCryptoContextBGVRNS")
@@ -172,6 +185,7 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetBatchSize", &SetBatchSize<BGV>)
       .function("SetScalingTechnique", &SetScalingTechnique<BGV>)
       .function("SetKeySwitchTechnique", &SetKeySwitchTechnique<BGV>)
+      .function("SetMultipartyMode", &SetMultipartyMode<BGV>)
       .function("toString", &GetString<CCP_BGV>);
 
   class_<CCP_CKKS>("CCParamsCryptoContextCKKSRNS")
@@ -187,6 +201,7 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetBatchSize", &SetBatchSize<CKKS>)
       .function("SetScalingTechnique", &SetScalingTechnique<CKKS>)
       .function("SetKeySwitchTechnique", &SetKeySwitchTechnique<CKKS>)
+      .function("SetMultipartyMode", &SetMultipartyMode<CKKS>)
       .function("toString", &GetString<CCP_CKKS>);
 }
 
