@@ -142,6 +142,51 @@ void SetMultipartyMode(
 ) {
   CryptoParameters.SetMultipartyMode(mm);
 }
+
+template<typename Scheme>
+void SetDigitSize(
+    CCParams<Scheme> &CryptoParameters,
+    usint digitSize
+) {
+  CryptoParameters.SetDigitSize(digitSize);
+}
+template<typename Scheme>
+void SetStandardDeviation(
+    CCParams<Scheme> &CryptoParameters,
+    float stdDev
+) {
+  CryptoParameters.SetStandardDeviation(stdDev);
+}
+template<typename Scheme>
+void SetSecretKeyDist(
+    CCParams<Scheme> &CryptoParameters,
+    SecretKeyDist skDist
+) {
+  CryptoParameters.SetSecretKeyDist(skDist);
+}
+
+template<typename Scheme>
+void SetMaxRelinSkDeg(
+    CCParams<Scheme> &CryptoParameters,
+    usint maxSkDeg
+) {
+  CryptoParameters.SetMaxRelinSkDeg(maxSkDeg);
+}
+template<typename Scheme>
+void SetKeySwitchCount(
+    CCParams<Scheme> &CryptoParameters,
+    usint ksCount
+) {
+  CryptoParameters.SetKeySwitchCount(ksCount);
+}
+template<typename Scheme>
+void SetEvalAddCount(
+    CCParams<Scheme> &CryptoParameters,
+    usint eaCount
+) {
+  CryptoParameters.SetEvalAddCount(eaCount);
+}
+
 using CKKS = CryptoContextCKKSRNS;
 using CCP_CKKS = CCParams<CKKS>;
 using BFV = CryptoContextBFVRNS;

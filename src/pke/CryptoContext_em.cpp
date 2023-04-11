@@ -26,13 +26,6 @@ using namespace emscripten;
 #include "core/backend_em.h"
 #include "core/clear_context.h"
 
-CryptoContext<DCRTPoly> GenCryptoContextBFV2() {
-  CCParams<CryptoContextBFVRNS> parameters;
-  parameters.SetPlaintextModulus(65537);
-  parameters.SetMultiplicativeDepth(2);
-  return GenCryptoContext(parameters);
-}
-
 CryptoContext<DCRTPoly> GenCryptoContextBFV(CCParams<CryptoContextBFVRNS> params) {
   return GenCryptoContext(params);
 }
@@ -78,6 +71,22 @@ Plaintext MakePackedPlaintext(
     uint32_t level = 0
 ) {
   return cryptoCtx->MakePackedPlaintext(values, depth, level);
+}
+
+template<typename Element>
+Plaintext MakePackedPlaintextSingle(
+    const CryptoContext<Element> cryptoCtx,
+    std::vector<int64_t> values,
+    size_t depth = 1
+) {
+  return cryptoCtx->MakePackedPlaintext(values, depth, 0);
+}
+template<typename Element>
+Plaintext MakePackedPlaintextZero(
+    const CryptoContext<Element> cryptoCtx,
+    std::vector<int64_t> values
+) {
+  return cryptoCtx->MakePackedPlaintext(values, 1, 0);
 }
 
 /**
@@ -719,10 +728,9 @@ using CC = CryptoContextImpl<DCRTPoly>;
 using CC_prime = CryptoContext<DCRTPoly>;
 EMSCRIPTEN_BINDINGS(CryproContext) {
 
-  emscripten::function("GenCryptoContextBFV2", &GenCryptoContextBFV2);
-  emscripten::function("GenCryptoContextBFV", select_overload<CC_prime(CCP_BFV)>(&GenCryptoContextBFV));
-  emscripten::function("GenCryptoContextCKKS", select_overload<CC_prime(CCP_CKKS)>(&GenCryptoContextCKKS));
-  emscripten::function("GenCryptoContextBGV", select_overload<CC_prime(CCP_BGV)>(&GenCryptoContextBGV));
+  emscripten::function("GenCryptoContextBFV", &GenCryptoContextBFV);
+  emscripten::function("GenCryptoContextCKKS", &GenCryptoContextCKKS);
+  emscripten::function("GenCryptoContextBGV", &GenCryptoContextBGV);
 
   emscripten::register_vector<Ciphertext<DCRTPoly >>("VectorCiphertextDCRTPoly");
   emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");
@@ -763,6 +771,8 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
           // 2 args
       .function("EvalAtIndexKeyGen", &EvalAtIndexKeyGen<DCRTPoly>)
       .function("MakePackedPlaintext", &MakePackedPlaintext<DCRTPoly>)
+      .function("MakePackedPlaintext", &MakePackedPlaintextSingle<DCRTPoly>)
+      .function("MakePackedPlaintext", &MakePackedPlaintextZero<DCRTPoly>)
       .function("MakeCKKSPackedPlaintext", &MakeCKKSPackedPlaintext<DCRTPoly>)
           // select_overload() required because the other overload is deprecated
       .function("ReEncrypt", &ReEncrypt2<DCRTPoly>)
