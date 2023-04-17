@@ -106,7 +106,7 @@ void SetRingDim(
 template<typename Scheme>
 void SetScalingModSize(
     CCParams<Scheme> &CryptoParameters,
-    uint32_t scalingModSize
+    usint scalingModSize
 ) {
   CryptoParameters.SetScalingModSize(scalingModSize);
 }
@@ -146,7 +146,7 @@ void SetMultipartyMode(
 template<typename Scheme>
 void SetDigitSize(
     CCParams<Scheme> &CryptoParameters,
-    usint digitSize
+    uint32_t digitSize
 ) {
   CryptoParameters.SetDigitSize(digitSize);
 }
@@ -168,7 +168,7 @@ void SetSecretKeyDist(
 template<typename Scheme>
 void SetMaxRelinSkDeg(
     CCParams<Scheme> &CryptoParameters,
-    usint maxSkDeg
+    int maxSkDeg
 ) {
   CryptoParameters.SetMaxRelinSkDeg(maxSkDeg);
 }
@@ -215,6 +215,12 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetScalingTechnique", &SetScalingTechnique<BFV>)
       .function("SetKeySwitchTechnique", &SetKeySwitchTechnique<BFV>)
       .function("SetMultipartyMode", &SetMultipartyMode<BFV>)
+      .function("SetDigitSize", &SetDigitSize<BFV>)
+      .function("SetStandardDeviation", &SetStandardDeviation<BFV>)
+      .function("SetSecretKeyDist", &SetSecretKeyDist<BFV>)
+      .function("SetMaxRelinSkDeg", &SetMaxRelinSkDeg<BFV>)
+      .function("SetKeySwitchCount", &SetKeySwitchCount<BFV>)
+      .function("SetEvalAddCount", &SetEvalAddCount<BFV>)
       .function("toString", &GetString<CCP_BFV>);
 
   class_<CCP_BGV>("CCParamsCryptoContextBGVRNS")
@@ -231,6 +237,13 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetScalingTechnique", &SetScalingTechnique<BGV>)
       .function("SetKeySwitchTechnique", &SetKeySwitchTechnique<BGV>)
       .function("SetMultipartyMode", &SetMultipartyMode<BGV>)
+
+      .function("SetDigitSize", &SetDigitSize<BGV>)
+      .function("SetStandardDeviation", &SetStandardDeviation<BGV>)
+      .function("SetSecretKeyDist", &SetSecretKeyDist<BGV>)
+      .function("SetMaxRelinSkDeg", &SetMaxRelinSkDeg<BGV>)
+      .function("SetKeySwitchCount", &SetKeySwitchCount<BGV>)
+      .function("SetEvalAddCount", &SetEvalAddCount<BGV>)
       .function("toString", &GetString<CCP_BGV>);
 
   class_<CCP_CKKS>("CCParamsCryptoContextCKKSRNS")
@@ -247,6 +260,12 @@ EMSCRIPTEN_BINDINGS(parameters) {
       .function("SetScalingTechnique", &SetScalingTechnique<CKKS>)
       .function("SetKeySwitchTechnique", &SetKeySwitchTechnique<CKKS>)
       .function("SetMultipartyMode", &SetMultipartyMode<CKKS>)
+      .function("SetDigitSize", &SetDigitSize<CKKS>)
+      .function("SetStandardDeviation", &SetStandardDeviation<CKKS>)
+      .function("SetSecretKeyDist", &SetSecretKeyDist<CKKS>)
+      .function("SetMaxRelinSkDeg", &SetMaxRelinSkDeg<CKKS>)
+      .function("SetKeySwitchCount", &SetKeySwitchCount<CKKS>)
+      .function("SetEvalAddCount", &SetEvalAddCount<CKKS>)
       .function("toString", &GetString<CCP_CKKS>);
 }
 

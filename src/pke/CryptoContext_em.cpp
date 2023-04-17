@@ -98,9 +98,16 @@ Plaintext MakePackedPlaintextZero(
  * @return ciphertext (or null on failure)
  */
 template<typename Element>
-Ciphertext<Element> Encrypt(const CryptoContext<Element> cryptoCtx,
-                            const PublicKey<Element> publicKey,
-                            Plaintext plaintext) {
+Ciphertext<Element> EncryptPKPT(const CryptoContext<Element> cryptoCtx,
+                                const PublicKey<Element> publicKey,
+                                Plaintext plaintext) {
+  return cryptoCtx->Encrypt(publicKey, plaintext);
+}
+template<typename Element>
+Ciphertext<Element> EncryptPTPK(const CryptoContext<Element> cryptoCtx,
+                                Plaintext plaintext,
+                                const PublicKey<Element> publicKey
+) {
   return cryptoCtx->Encrypt(publicKey, plaintext);
 }
 
@@ -745,10 +752,8 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .constructor(&std::make_shared<CryptoContextImpl<DCRTPoly>>, allow_raw_pointers())
           // ignoring mult-feature Enable() for now
       .function("Enable", select_overload<void(PKESchemeFeature)>(&CC::Enable))
-      .function("Encrypt",
-                &Encrypt<DCRTPoly>)// select_overload<Ciphertext<DCRTPoly>(Plaintext, const PublicKey<DCRTPoly>)>(&CC::Encrypt))
+      .function("Encrypt", &EncryptPKPT<DCRTPoly>)
       .function("KeyGen", &CC::KeyGen)
-          // select_overload() required because the other overload is deprecated
       .function("MultipartyKeyGen", &MultipartyKeyGen<DCRTPoly>)
       .function("KeySwitchGen", &CC::KeySwitchGen)
       .function("MultiKeySwitchGen", &CC::MultiKeySwitchGen)
