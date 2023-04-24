@@ -39,14 +39,26 @@ add_link_options(
         # they are necessary for JSON serialization to work
         #	-sDISABLE_EXCEPTION_CATCHING
 
-
         # See https://github.com/emscripten-core/emscripten/blob/main/src/settings.js for more
         # information
-        -sEXCEPTION_DEBUG=1
+        # Original Values
+#        -sEXCEPTION_DEBUG=1
+#        -sALLOW_MEMORY_GROWTH=1
+#        -sERROR_ON_UNDEFINED_SYMBOLS=0
+#        -sMAXIMUM_MEMORY=4GB
 
+
+        # Debug Values
+        -sASYNCIFY_DEBUG=2
         -sALLOW_MEMORY_GROWTH=1
+        -sDISABLE_EXCEPTION_CATCHING=0
         -sERROR_ON_UNDEFINED_SYMBOLS=0
+        -sEXCEPTION_DEBUG=true
+        -sEXCEPTION_STACK_TRACES=true
         -sMAXIMUM_MEMORY=4GB
+        -sRUNTIME_LOGGING=true
+        # Exception handling + helping
+	# 	in prod, make sure you remove these
 )
 add_compile_options("-DOPENFHE_VERSION=${OpenFHE_VERSION}")
 
