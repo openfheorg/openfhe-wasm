@@ -54,7 +54,6 @@ add_link_options(
         -sDISABLE_EXCEPTION_CATCHING=0
         -sERROR_ON_UNDEFINED_SYMBOLS=0
         -sEXCEPTION_DEBUG=true
-        -sEXCEPTION_STACK_TRACES=true
         -sMAXIMUM_MEMORY=4GB
         -sRUNTIME_LOGGING=true
         # Exception handling + helping
