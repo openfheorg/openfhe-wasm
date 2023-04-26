@@ -27,8 +27,8 @@ if (OpenFHE_FOUND)
     message(STATUS "OpenFHE Library Directories: ${OpenFHE_LIBDIR}")
     message(STATUS "OpenFHE installed as shared libraries: ${OpenFHE_SHARED}")
     message(STATUS "OpenFHE Native Backend size: ${OpenFHE_NATIVE_SIZE}")
-else()
-    message( FATAL_ERROR "Could not find OpenFHE. Exiting." )
+else ()
+    message(FATAL_ERROR "Could not find OpenFHE. Exiting.")
 endif ()
 
 set(NATIVE_SIZE ${OPENFHE_NATIVE_SIZE})
@@ -37,27 +37,27 @@ message(STATUS "NATIVE_SIZE set to: " ${NATIVE_SIZE})
 add_link_options(
         # for now, exceptions are enabled.
         # they are necessary for JSON serialization to work
-        #	-sDISABLE_EXCEPTION_CATCHING
 
         # See https://github.com/emscripten-core/emscripten/blob/main/src/settings.js for more
         # information
         # Original Values
-        -sEXCEPTION_DEBUG=1
         -sALLOW_MEMORY_GROWTH=1
         -sERROR_ON_UNDEFINED_SYMBOLS=0
         -sMAXIMUM_MEMORY=4GB
+        -sDISABLE_EXCEPTION_CATCHING
 
 
-#         #Debug Values
+        #         #Debug Values
         # Exception handling + helping
         # 	in prod, make sure you remove these
-        -sASYNCIFY_DEBUG=2
-        -sALLOW_MEMORY_GROWTH=1
-        -sDISABLE_EXCEPTION_CATCHING=0
-        -sERROR_ON_UNDEFINED_SYMBOLS=0
-        -sEXCEPTION_DEBUG=true
-        -sMAXIMUM_MEMORY=4GB
-        -sRUNTIME_LOGGING=true
+#        -sEXCEPTION_DEBUG=1
+#        -sASYNCIFY_DEBUG=2
+#        -sALLOW_MEMORY_GROWTH=1
+#        -sDISABLE_EXCEPTION_CATCHING=0
+#        -sERROR_ON_UNDEFINED_SYMBOLS=0
+#        -sEXCEPTION_DEBUG=true
+#        -sMAXIMUM_MEMORY=4GB
+#        -sRUNTIME_LOGGING=true
 )
 add_compile_options("-DOPENFHE_VERSION=${OpenFHE_VERSION}")
 

@@ -320,13 +320,25 @@ Ciphertext<Element> EvalMerge(const CryptoContext<Element> &cryptoCtx, emscripte
 //                                   emscripten::val ciphertexts,
 //                                   emscripten::val constants) {
 //  auto constArr = convertJSArrayToNumberVector<double>(constants);
-//  std::vector<Ciphertext<Element>> container;
-//  auto converted = vecFromJSArray<Ciphertext < Element > >(ciphertexts);
-//  for (auto &el: converted){
-//    container.emplace_back(*el);
+//  std::vector<Ciphertext<Element>> ciphertextVec = vecFromJSArray<Ciphertext<DCRTPoly>>(ciphertexts);
+//  std::vector<ConstCiphertext<Element>> constCiphertextVec = vecFromJSArray<ConstCiphertext<DCRTPoly>>(ciphertexts);
+//  return ciphertextVec[0];
+//  for (auto &el: ciphertextVec){
+//    auto derefed = *el;
+//    const ConstCiphertext<Element> consted = const derefed;
+//    container.emplace_back(consted);
 //  }
 //  return cryptoCtx->EvalLinearWSum(container, constArr);
 //}
+
+template<typename Element>
+Ciphertext<Element> EvalLinearWSum(const CryptoContext<Element> &cryptoCtx,
+                                   emscripten::val ciphertexts,
+                                   emscripten::val constants) {
+  std::vector<ConstCiphertext<Element>> constCiphertexts = vecFromJSArray<ConstCiphertext<Element>>(ciphertexts);
+  return cryptoCtx->EvalLinearWSum(constCiphertexts,
+                                   convertJSArrayToNumberVector<double>(constants));
+}
 
 /**
  * @brief this is a wrapper for the hoisted automorphism
@@ -795,7 +807,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .function("EvalInnerProduct", &EvalInnerProduct<DCRTPoly>)
       .function("EvalMultMany", &EvalMultMany<DCRTPoly>)
       .function("EvalMerge", &EvalMerge<DCRTPoly>)
-//    .function("EvalLinearWSum", &EvalLinearWSum<DCRTPoly>)
+      .function("EvalLinearWSum", &EvalLinearWSum<DCRTPoly>)
       .function("ModReduce", &ModReduce<DCRTPoly>)
       .function("EvalSumKeyGen", &EvalSumKeyGen1<DCRTPoly>)
       .function("GetEvalSumKeyMap", &GetEvalSumKeyMap<DCRTPoly>)
@@ -816,3 +828,6 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .function("ReKeyGenPrivPub", &ReKeyGenWrapped<DCRTPoly>)
       .function("ReKeyGenPubPriv", &ReKeyGenWrappedTwo<DCRTPoly>);
 }
+
+// vector<shared_ptr<CiphertextImpl<lbcrypto::DCRTPolyImpl<bigintdyn::mubintvec<bigintdyn::ubint<unsigned int>>>>>>
+// vector<shared_ptr<const CiphertextImpl<lbcrypto::DCRTPolyImpl<bigintdyn::mubintvec<bigintdyn::ubint<unsigned int>>>>>> &
