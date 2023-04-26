@@ -1,35 +1,17 @@
 import assert from 'assert'
 import factory from '../lib/openfhe_pke.js'
-import {copyVecToJs, } from "./common.mjs";
+import {copyVecToJs, setupCCBGV, setupParamsBGV,} from "./common.mjs";
 
 const targetTowers = 1;
 
-async function TestBGVCompress(){
+async function TestBGVCompress() {
     const module = await factory();
-    /** Set the main parameters
-     * all int types are number in typescript unless defined otherwise.
-     */
-
-    const plaintextMod = 65537;
-    const multDepth = 2;
-    const sDev = 3.2
-    let params = new module.CCParamsCryptoContextBGVRNS();
-    params.SetPlaintextModulus(plaintextMod);
-    params.SetMultiplicativeDepth(multDepth);
-    params.SetStandardDeviation(sDev);
-    params.SetSecurityLevel(module.SecurityLevel.HEStd_128_classic);
-    params.SetSecretKeyDist(module.SecretKeyDist.UNIFORM_TERNARY);
-    params.SetKeySwitchTechnique(module.KeySwitchTechnique.HYBRID);
-
-
+    let params = await new module.CCParamsCryptoContextBGVRNS();
+    params = await setupParamsBGV(params);
     let cc = new module.GenCryptoContextBGV(params);
-    cc.Enable(module.PKESchemeFeature.PKE);
-    cc.Enable(module.PKESchemeFeature.PRE);
-    cc.Enable(module.PKESchemeFeature.LEVELEDSHE);
+    let kp = undefined;
+    [cc, kp] = await setupCCBGV(cc);
 
-    let kp = cc.KeyGen();
-    cc.EvalMultKeyGen(kp.secretKey);
-    cc.EvalAtIndexKeyGen(kp.secretKey, [1, 2, -1, -2]);
     try {
 
         const x = [5];
