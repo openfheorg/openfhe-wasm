@@ -42,13 +42,15 @@ add_link_options(
         # See https://github.com/emscripten-core/emscripten/blob/main/src/settings.js for more
         # information
         # Original Values
-#        -sEXCEPTION_DEBUG=1
-#        -sALLOW_MEMORY_GROWTH=1
-#        -sERROR_ON_UNDEFINED_SYMBOLS=0
-#        -sMAXIMUM_MEMORY=4GB
+        -sEXCEPTION_DEBUG=1
+        -sALLOW_MEMORY_GROWTH=1
+        -sERROR_ON_UNDEFINED_SYMBOLS=0
+        -sMAXIMUM_MEMORY=4GB
 
 
-        # Debug Values
+#         #Debug Values
+        # Exception handling + helping
+        # 	in prod, make sure you remove these
         -sASYNCIFY_DEBUG=2
         -sALLOW_MEMORY_GROWTH=1
         -sDISABLE_EXCEPTION_CATCHING=0
@@ -56,8 +58,6 @@ add_link_options(
         -sEXCEPTION_DEBUG=true
         -sMAXIMUM_MEMORY=4GB
         -sRUNTIME_LOGGING=true
-        # Exception handling + helping
-	# 	in prod, make sure you remove these
 )
 add_compile_options("-DOPENFHE_VERSION=${OpenFHE_VERSION}")
 

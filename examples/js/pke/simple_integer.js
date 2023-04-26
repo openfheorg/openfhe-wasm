@@ -36,8 +36,8 @@ async function main() {
     cc.EvalAtIndexKeyGen(keyPair.secretKey, [1, 2, -1, -2]);
 
     console.log(cc);
-    const vectorOfInts1 = module.MakeVectorInt64Clipped(
-        [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+    const in1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    const vectorOfInts1 = module.MakeVectorInt64Clipped(in1);
     //"Plaintext" type is switched to string
     const plaintext1 = cc.MakePackedPlaintext(vectorOfInts1, 1);
     // Second plaintext vector is encoded (64bit signed in C/C++ => BigInt64Array
