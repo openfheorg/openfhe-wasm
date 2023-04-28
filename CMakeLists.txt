@@ -16,6 +16,7 @@ include_directories(${OpenFHE_INCLUDE})
 include_directories(${OpenFHE_INCLUDE}/third-party/include)
 include_directories(${OpenFHE_INCLUDE}/core)
 include_directories(${OpenFHE_INCLUDE}/pke)
+include_directories(${OpenFHE_INCLUDE}/binfhe)
 link_directories(${OpenFHE_LIBDIR})
 link_libraries(${OpenFHE_LIBRARIES})
 
@@ -53,6 +54,7 @@ add_compile_options("-DOPENFHE_VERSION=${OpenFHE_VERSION}")
 ### add each of the subdirs of src
 add_subdirectory(src/core)
 add_subdirectory(src/pke)
+add_subdirectory(src/binfhe)
 
 #find_package(Doxygen QUIET COMPONENTS dot)
 #if (DOXYGEN_FOUND)
