@@ -44,7 +44,7 @@ EMSCRIPTEN_BINDINGS(binfhe_types) {
       .value("XNOR_FAST", XNOR_FAST)
       .value("XOR", XOR)
       .value("XNOR", XNOR);
-  enum_<BINFHE_METHOD>("BINFHEMETHOD").value("AP", AP).value("GINX", GINX);
+  enum_<BINFHE_METHOD>("BINFHE_METHOD").value("AP", AP).value("GINX", GINX);
 }
 
 #endif //_OPENFHEWEB_BINFHE_BINFHE_TYPES_EM_H

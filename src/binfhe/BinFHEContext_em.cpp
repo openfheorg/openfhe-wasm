@@ -48,7 +48,7 @@ void GenerateBinFHEContext1(
       baseKS,
       baseG,
       baseR,
-      method
+      method = GINX
       );
 }
 
@@ -66,10 +66,10 @@ void GenerateBinFHEContext2(
     BinFHEContext *cryptoCtx,
     BINFHE_PARAMSET set,
     bool arbFunc,
-    uint32_t logQ,
-    int64_t N,
-    BINFHE_METHOD method,
-    bool timeOptimization
+    uint32_t logQ = 11,
+    int64_t N = 0 ,
+    BINFHE_METHOD method = GINX,
+    bool timeOptimization = false
 ) {
   cryptoCtx->GenerateBinFHEContext(set, arbFunc, logQ, N, method, timeOptimization);
 }
@@ -81,7 +81,7 @@ void GenerateBinFHEContext2(
 void GenerateBinFHEContext3(
     BinFHEContext *cryptoCtx,
     BINFHE_PARAMSET set,
-    BINFHE_METHOD method
+    BINFHE_METHOD method = GINX
 ) {
   cryptoCtx->GenerateBinFHEContext(set, method);
 }
@@ -131,7 +131,7 @@ void BTKeyGen(BinFHEContext *cryptoCtx, LWEPrivateKey sk) { cryptoCtx->BTKeyGen(
  * @param skN old secret key
  * @return a shared pointer to the switching key
  */
-std::shared_ptr<LWESwitchingKeyImpl> KeySwitchGen(
+LWESwitchingKey KeySwitchGen(
     BinFHEContext *cryptoCtx,
     ConstLWEPrivateKey sk,
     ConstLWEPrivateKey skN) {
@@ -193,9 +193,9 @@ EMSCRIPTEN_BINDINGS(binfhe) {
       .function("Encrypt", &Encrypt, allow_raw_pointers())
 
       .function("Decrypt", &Decrypt, allow_raw_pointers())
-      .function("BTKeyGen", BTKeyGen, allow_raw_pointers())
-      .function("BTKeyLoad", BTKeyLoad)
-      .function("KeySwitchGen", KeySwitchGen, allow_raw_pointers())
+      .function("BTKeyGen", &BTKeyGen, allow_raw_pointers())
+      .function("BTKeyLoad", &BTKeyLoad)
+      .function("KeySwitchGen", &KeySwitchGen, allow_raw_pointers())
 
       .function("EvalBinGate", &EvalBinGate, allow_raw_pointers())
       .function("Bootstrap", &Bootstrap, allow_raw_pointers())
@@ -203,9 +203,8 @@ EMSCRIPTEN_BINDINGS(binfhe) {
       .function("KeyGen", &BinFHEContext::KeyGen)
       .function("KeyGenN", &BinFHEContext::KeyGenN)
 
-      .function("GetRefreshKey", &BinFHEContext::GetRefreshKey)
       .function("ClearBTKeys", &BinFHEContext::ClearBTKeys)
-      .function("GetRefreshKey", &BinFHEContext::GetRefreshKey)
+      .function("GetRefreshKey", &BinFHEContext::GetRefreshKey, allow_raw_pointers())
       .function("GetSwitchKey", &BinFHEContext::GetSwitchKey)
       .function("GetParams", &BinFHEContext::GetParams)
       .function("GetLWEScheme", &BinFHEContext::GetLWEScheme)
