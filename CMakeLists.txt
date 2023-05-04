@@ -16,6 +16,7 @@ include_directories(${OpenFHE_INCLUDE})
 include_directories(${OpenFHE_INCLUDE}/third-party/include)
 include_directories(${OpenFHE_INCLUDE}/core)
 include_directories(${OpenFHE_INCLUDE}/pke)
+include_directories(${OpenFHE_INCLUDE}/binfhe)
 link_directories(${OpenFHE_LIBDIR})
 link_libraries(${OpenFHE_LIBRARIES})
 
@@ -42,17 +43,19 @@ add_link_options(
 
         # See https://github.com/emscripten-core/emscripten/blob/main/src/settings.js for more
         # information
-        -sEXCEPTION_DEBUG=1
+        #-sEXCEPTION_DEBUG=1
 
-        -sALLOW_MEMORY_GROWTH=1
-        -sERROR_ON_UNDEFINED_SYMBOLS=0
-        -sMAXIMUM_MEMORY=4GB
+        -sALLOW_MEMORY_GROWTH=true
+        -sMEMORY_GROWTH_GEOMETRIC_STEP=0.50
+        -sMAXIMUM_MEMORY=4gb # Is the maximum value as of 3rd May
+        -sINITIAL_MEMORY=2gb
 )
 add_compile_options("-DOPENFHE_VERSION=${OpenFHE_VERSION}")
 
 ### add each of the subdirs of src
 add_subdirectory(src/core)
 add_subdirectory(src/pke)
+add_subdirectory(src/binfhe)
 
 #find_package(Doxygen QUIET COMPONENTS dot)
 #if (DOXYGEN_FOUND)

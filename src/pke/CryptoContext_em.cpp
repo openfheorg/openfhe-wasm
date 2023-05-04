@@ -715,14 +715,14 @@ EvalKey<Element> ReKeyGenWrappedTwo(const CryptoContext<Element> &cc,
   return cc->ReKeyGen(priv, pub);
 }
 
-using CC = CryptoContextImpl<DCRTPoly>;
-using CC_prime = CryptoContext<DCRTPoly>;
+using CC_IMPL = CryptoContextImpl<DCRTPoly>;
+using CC = CryptoContext<DCRTPoly>;
 EMSCRIPTEN_BINDINGS(CryproContext) {
 
   emscripten::function("GenCryptoContextBFV2", &GenCryptoContextBFV2);
-  emscripten::function("GenCryptoContextBFV", select_overload<CC_prime(CCP_BFV)>(&GenCryptoContextBFV));
-  emscripten::function("GenCryptoContextCKKS", select_overload<CC_prime(CCP_CKKS)>(&GenCryptoContextCKKS));
-  emscripten::function("GenCryptoContextBGV", select_overload<CC_prime(CCP_BGV)>(&GenCryptoContextBGV));
+  emscripten::function("GenCryptoContextBFV", select_overload<CC(CCP_BFV)>(&GenCryptoContextBFV));
+  emscripten::function("GenCryptoContextCKKS", select_overload<CC(CCP_CKKS)>(&GenCryptoContextCKKS));
+  emscripten::function("GenCryptoContextBGV", select_overload<CC(CCP_BGV)>(&GenCryptoContextBGV));
 
   emscripten::register_vector<Ciphertext<DCRTPoly >>("VectorCiphertextDCRTPoly");
   emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");
@@ -736,30 +736,30 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .smart_ptr<CryptoContext<DCRTPoly>>("CryptoContext_DCRTPoly")
       .constructor(&std::make_shared<CryptoContextImpl<DCRTPoly>>, allow_raw_pointers())
           // ignoring mult-feature Enable() for now
-      .function("Enable", select_overload<void(PKESchemeFeature)>(&CC::Enable))
+      .function("Enable", select_overload<void(PKESchemeFeature)>(&CC_IMPL::Enable))
       .function("Encrypt",
-                &Encrypt<DCRTPoly>)// select_overload<Ciphertext<DCRTPoly>(Plaintext, const PublicKey<DCRTPoly>)>(&CC::Encrypt))
-      .function("KeyGen", &CC::KeyGen)
+                &Encrypt<DCRTPoly>)// select_overload<Ciphertext<DCRTPoly>(Plaintext, const PublicKey<DCRTPoly>)>(&CC_IMPL::Encrypt))
+      .function("KeyGen", &CC_IMPL::KeyGen)
           // select_overload() required because the other overload is deprecated
       .function("MultipartyKeyGen", &MultipartyKeyGen<DCRTPoly>)
-      .function("KeySwitchGen", &CC::KeySwitchGen)
-      .function("MultiKeySwitchGen", &CC::MultiKeySwitchGen)
-      .function("MultiAddEvalKeys", &CC::MultiAddEvalKeys)
-      .function("MultiAddEvalMultKeys", &CC::MultiAddEvalMultKeys)
-      .function("MultiAddEvalSumKeys", &CC::MultiAddEvalSumKeys)
+      .function("KeySwitchGen", &CC_IMPL::KeySwitchGen)
+      .function("MultiKeySwitchGen", &CC_IMPL::MultiKeySwitchGen)
+      .function("MultiAddEvalKeys", &CC_IMPL::MultiAddEvalKeys)
+      .function("MultiAddEvalMultKeys", &CC_IMPL::MultiAddEvalMultKeys)
+      .function("MultiAddEvalSumKeys", &CC_IMPL::MultiAddEvalSumKeys)
       .function("InsertEvalSumKey", &InsertEvalSumKey<DCRTPoly>)
       .function("InsertEvalMultKey", &InsertEvalMultKey<DCRTPoly>)
-      .function("MultiMultEvalKey", &CC::MultiMultEvalKey)
-      .function("MultiEvalSumKeyGen", &CC::MultiEvalSumKeyGen)
+      .function("MultiMultEvalKey", &CC_IMPL::MultiMultEvalKey)
+      .function("MultiEvalSumKeyGen", &CC_IMPL::MultiEvalSumKeyGen)
       .function("MultipartyDecryptLead", &MultipartyDecryptLead<DCRTPoly>)
       .function("MultipartyDecryptMain", &MultipartyDecryptMain<DCRTPoly>)
       .function("MultipartyDecryptFusion", &MultipartyDecryptFusion<DCRTPoly>)
-      .function("GetCryptoParameters", &CC::GetCryptoParameters)
-      .function("GetElementParams", &CC::GetElementParams)
-      .function("EvalMultKeyGen", &CC::EvalMultKeyGen)
+      .function("GetCryptoParameters", &CC_IMPL::GetCryptoParameters)
+      .function("GetElementParams", &CC_IMPL::GetElementParams)
+      .function("EvalMultKeyGen", &CC_IMPL::EvalMultKeyGen)
           // emscripten DOES support overloading based on # of params
           // 3 args
-      .function("EvalAtIndexKeyGen", &CC::EvalAtIndexKeyGen)
+      .function("EvalAtIndexKeyGen", &CC_IMPL::EvalAtIndexKeyGen)
           // 2 args
       .function("EvalAtIndexKeyGen", &EvalAtIndexKeyGen<DCRTPoly>)
       .function("MakePackedPlaintext", &MakePackedPlaintext<DCRTPoly>)
@@ -784,7 +784,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .function("ModReduce", &ModReduce<DCRTPoly>)
       .function("EvalSumKeyGen", &EvalSumKeyGen1<DCRTPoly>)
       .function("GetEvalSumKeyMap", &GetEvalSumKeyMap<DCRTPoly>)
-      .function("GetRingDimension", &CC::GetRingDimension)
+      .function("GetRingDimension", &CC_IMPL::GetRingDimension)
       .function("Compress", &Compress<DCRTPoly>)
       .function("GetBatchSize", &GetBatchSize<DCRTPoly>)
       .function("GetPlaintextModulus", &GetPlaintextModulus<DCRTPoly>)
