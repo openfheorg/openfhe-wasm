@@ -18,42 +18,24 @@ function dot(x, y) {
     return sum;
 }
 
-const size = 2;
-
 async function TestArbBFVInnerProductPackedArray() {
-    const limit = 15;
-    const plaintextMod = 2333;
+    const input1 = [1,2,3,4,5];
+    const expectedResult = dot(input1, input1);
+    const result = await ArbBFVInnerProductPackedArray(input1, input1);
 
-    const input1 = makeRandomArray(size, limit);
-    const input2 = makeRandomArray(size, limit);
-
-    let expectedResult = dot(input1, input2) % plaintextMod;
-    if (expectedResult > plaintextMod / 2) expectedResult -= plaintextMod;
-
-    const result = await ArbBFVInnerProductPackedArray(input1, input2);
-
-    // assert.equal(expectedResult, result);
+    assert.equal(expectedResult, result);
 }
 
 // both inputs are VectorInt64
 async function ArbBFVInnerProductPackedArray(input1, input2) {
-    // const plaintextModulus = 65537;
-    // const sigma = 3.2;
-    // const depth = 2;
-    //
-    // const cc = module.GenCryptoContextBFVrns(
-    //     plaintextModulus, module.SecurityLevel.HEStd_128_classic,
-    //     sigma, 0, depth, 0, module.MODE.OPTIMIZED);
-    //
-    // cc.Enable(module.PKESchemeFeature.ENCRYPTION);
-    // cc.Enable(module.PKESchemeFeature.SHE);
 
     const module = await factory();
     let params = await new module.CCParamsCryptoContextBFVRNS();
     params = await setupParamsBFV(params);
     let cc = new module.GenCryptoContextBFV(params);
+    const size = cc.GetRingDimension();
     let kp = undefined;
-    [cc, kp] = await setupCCBFV(cc, [1, 2])
+    [cc, kp] = await setupCCBFV(cc);
 
     // Initialize the public key containers
 
@@ -66,8 +48,11 @@ async function ArbBFVInnerProductPackedArray(input1, input2) {
     const ciphertext2 = cc.Encrypt(kp.publicKey, intArray2);
 
     console.log("Evalling");
-    const result = cc.EvalInnerProduct(ciphertext1, ciphertext2, size);
-    console.log("Finished");
+    const encResult = cc.EvalInnerProduct(ciphertext1, ciphertext2, size);
+    let ptResult = cc.Decrypt(kp.secretKey, encResult);
+    ptResult.SetLength(1);
+    let result = ptResult.GetPackedValue();
+    return result.get(0);
     //
     // const intArrayNew = cc.Decrypt(kp.secretKey, result);
     //
