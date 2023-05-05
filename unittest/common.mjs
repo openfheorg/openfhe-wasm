@@ -20,10 +20,8 @@ export async function setupParamsBFV(params) {
 export async function setupCCBFV(cc, indices=undefined) {
     const module = await factory();
     cc.Enable(module.PKESchemeFeature.PKE);
-    // cc.Enable(module.PKESchemeFeature.PRE);
     cc.Enable(module.PKESchemeFeature.LEVELEDSHE);
     cc.Enable(module.PKESchemeFeature.ADVANCEDSHE);
-    // cc.Enable(module.PKESchemeFeature.FHE);
     let kp = cc.KeyGen();
     cc.EvalMultKeyGen(kp.secretKey);
     cc.EvalSumKeyGen(kp.secretKey);

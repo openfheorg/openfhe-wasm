@@ -34,10 +34,10 @@ async function ArbBFVInnerProductPackedArray(input1, input2) {
     params = await setupParamsBFV(params);
     let cc = new module.GenCryptoContextBFV(params);
     const size = cc.GetRingDimension();
+
+    // If we don't pre-define the keypair (kp), JS complains
     let kp = undefined;
     [cc, kp] = await setupCCBFV(cc);
-
-    // Initialize the public key containers
 
     const input1vec = module.MakeVectorInt64Clipped(input1);
     const input2vec = module.MakeVectorInt64Clipped(input2);
@@ -47,17 +47,12 @@ async function ArbBFVInnerProductPackedArray(input1, input2) {
     const ciphertext1 = cc.Encrypt(kp.publicKey, intArray1);
     const ciphertext2 = cc.Encrypt(kp.publicKey, intArray2);
 
-    console.log("Evalling");
     const encResult = cc.EvalInnerProduct(ciphertext1, ciphertext2, size);
     let ptResult = cc.Decrypt(kp.secretKey, encResult);
     ptResult.SetLength(1);
     let result = ptResult.GetPackedValue();
     return result.get(0);
-    //
-    // const intArrayNew = cc.Decrypt(kp.secretKey, result);
-    //
-    // return intArrayNew.GetPackedValue().get(0);
-    // return undefined;
+
 }
 
 describe('CryptoContext', () => {
