@@ -16,8 +16,14 @@ export async function setupParamsBFV(params) {
     params.SetPlaintextModulus(plaintextMod);
     params.SetMultiplicativeDepth(multDepth);
     params.SetStandardDeviation(sDev);
-    params.SetSecurityLevel(module.SecurityLevel.HEStd_128_classic);
-    params.SetSecretKeyDist(module.SecretKeyDist.UNIFORM_TERNARY);
+    params.SetSecurityLevel(module.SecurityLevel.HEStd_NotSet);
+    params.SetSecretKeyDist(module.SecretKeyDist.GAUSSIAN);
+
+    params.SetKeySwitchCount(0);
+    params.SetMaxRelinSkDeg(2);
+    params.SetEvalAddCount(0);
+    params.SetDigitSize(0);
+    params.SetScalingModSize(60);
     return params;
 }
 

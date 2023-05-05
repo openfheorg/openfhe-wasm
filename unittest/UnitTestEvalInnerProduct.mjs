@@ -65,7 +65,9 @@ async function ArbBFVInnerProductPackedArray(input1, input2) {
     const ciphertext1 = cc.Encrypt(kp.publicKey, intArray1);
     const ciphertext2 = cc.Encrypt(kp.publicKey, intArray2);
 
+    console.log("Evalling");
     const result = cc.EvalInnerProduct(ciphertext1, ciphertext2, size);
+    console.log("Finished");
     //
     // const intArrayNew = cc.Decrypt(kp.secretKey, result);
     //
