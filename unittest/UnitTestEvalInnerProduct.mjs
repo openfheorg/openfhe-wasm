@@ -18,44 +18,26 @@ function dot(x, y) {
     return sum;
 }
 
-const size = 2;
-
 async function TestArbBFVInnerProductPackedArray() {
-    const limit = 15;
-    const plaintextMod = 2333;
+    const input1 = [1,2,3,4,5];
+    const expectedResult = dot(input1, input1);
+    const result = await ArbBFVInnerProductPackedArray(input1, input1);
 
-    const input1 = makeRandomArray(size, limit);
-    const input2 = makeRandomArray(size, limit);
-
-    let expectedResult = dot(input1, input2) % plaintextMod;
-    if (expectedResult > plaintextMod / 2) expectedResult -= plaintextMod;
-
-    const result = await ArbBFVInnerProductPackedArray(input1, input2);
-
-    // assert.equal(expectedResult, result);
+    assert.equal(expectedResult, result);
 }
 
 // both inputs are VectorInt64
 async function ArbBFVInnerProductPackedArray(input1, input2) {
-    // const plaintextModulus = 65537;
-    // const sigma = 3.2;
-    // const depth = 2;
-    //
-    // const cc = module.GenCryptoContextBFVrns(
-    //     plaintextModulus, module.SecurityLevel.HEStd_128_classic,
-    //     sigma, 0, depth, 0, module.MODE.OPTIMIZED);
-    //
-    // cc.Enable(module.PKESchemeFeature.ENCRYPTION);
-    // cc.Enable(module.PKESchemeFeature.SHE);
 
     const module = await factory();
     let params = await new module.CCParamsCryptoContextBFVRNS();
     params = await setupParamsBFV(params);
     let cc = new module.GenCryptoContextBFV(params);
-    let kp = undefined;
-    [cc, kp] = await setupCCBFV(cc, [1, 2])
+    const size = cc.GetRingDimension();
 
-    // Initialize the public key containers
+    // If we don't pre-define the keypair (kp), JS complains
+    let kp = undefined;
+    [cc, kp] = await setupCCBFV(cc);
 
     const input1vec = module.MakeVectorInt64Clipped(input1);
     const input2vec = module.MakeVectorInt64Clipped(input2);
@@ -65,12 +47,12 @@ async function ArbBFVInnerProductPackedArray(input1, input2) {
     const ciphertext1 = cc.Encrypt(kp.publicKey, intArray1);
     const ciphertext2 = cc.Encrypt(kp.publicKey, intArray2);
 
-    const result = cc.EvalInnerProduct(ciphertext1, ciphertext2, size);
-    //
-    // const intArrayNew = cc.Decrypt(kp.secretKey, result);
-    //
-    // return intArrayNew.GetPackedValue().get(0);
-    // return undefined;
+    const encResult = cc.EvalInnerProduct(ciphertext1, ciphertext2, size);
+    let ptResult = cc.Decrypt(kp.secretKey, encResult);
+    ptResult.SetLength(1);
+    let result = ptResult.GetPackedValue();
+    return result.get(0);
+
 }
 
 describe('CryptoContext', () => {
