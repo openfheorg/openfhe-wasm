@@ -27,38 +27,64 @@ if (OpenFHE_FOUND)
     message(STATUS "OpenFHE Library Directories: ${OpenFHE_LIBDIR}")
     message(STATUS "OpenFHE installed as shared libraries: ${OpenFHE_SHARED}")
     message(STATUS "OpenFHE Native Backend size: ${OpenFHE_NATIVE_SIZE}")
-else()
-    message( FATAL_ERROR "Could not find OpenFHE. Exiting." )
+else ()
+    message(FATAL_ERROR "Could not find OpenFHE. Exiting.")
 endif ()
 
 set(NATIVE_SIZE ${OPENFHE_NATIVE_SIZE})
 message(STATUS "NATIVE_SIZE set to: " ${NATIVE_SIZE})
 
-add_link_options(
-        # for now, exceptions are enabled.
-        # they are necessary for JSON serialization to work
-        #	-sDISABLE_EXCEPTION_CATCHING
+if (CMAKE_BUILD_TYPE)
+    set(RELEASE_TYPES
+            Debug
+            Release
+            RelWithDebInfo
+            MinSizeRel)
+    list(FIND RELEASE_TYPES ${CMAKE_BUILD_TYPE} INDEX_FOUND)
+    if (${INDEX_FOUND} EQUAL -1)
+        message(
+                FATAL_ERROR
+                "CMAKE_BUILD_TYPE must be one of Debug, Release, RelWithDebInfo, or MinSizeRel"
+        )
+    endif ()
+else ()
+    # if no build type is chosen, default to Release mode
+    set(CMAKE_BUILD_TYPE Release CACHE STRING
+            "Choose the type of build, options are: None, Debug, Release, RelWithDebInfo, or
+	MinSizeRel."
+            FORCE)
+endif ()
 
-        # See https://github.com/emscripten-core/emscripten/blob/main/src/settings.js for more
-        # information
-        # Original Values
-#        -sEXCEPTION_DEBUG=1
-#        -sALLOW_MEMORY_GROWTH=1
-#        -sERROR_ON_UNDEFINED_SYMBOLS=0
-#        -sMAXIMUM_MEMORY=4GB
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    message(STATUS "In Debug Mode")
+    add_link_options(
+            # See https://github.com/emscripten-core/emscripten/blob/main/src/settings.js for more information
+
+            -sEXCEPTION_DEBUG=1
+            -sASYNCIFY_DEBUG=2
+            -sALLOW_MEMORY_GROWTH=1
+            -sDISABLE_EXCEPTION_CATCHING=0
+            -sERROR_ON_UNDEFINED_SYMBOLS=0
+            -sEXCEPTION_DEBUG=true
+            -sMAXIMUM_MEMORY=4GB
+            -sRUNTIME_LOGGING=true
+    )
+
+else ()
+
+    message(STATUS "In Release Mode")
+    add_link_options(
+            # See https://github.com/emscripten-core/emscripten/blob/main/src/settings.js for more
+            # information
+            # Original Values
+            -sALLOW_MEMORY_GROWTH=1
+            -sERROR_ON_UNDEFINED_SYMBOLS=0
+            -sMAXIMUM_MEMORY=4GB
+            -sDISABLE_EXCEPTION_CATCHING
+    )
+endif ()
 
 
-        # Debug Values
-        -sASYNCIFY_DEBUG=2
-        -sALLOW_MEMORY_GROWTH=1
-        -sDISABLE_EXCEPTION_CATCHING=0
-        -sERROR_ON_UNDEFINED_SYMBOLS=0
-        -sEXCEPTION_DEBUG=true
-        -sMAXIMUM_MEMORY=4GB
-        -sRUNTIME_LOGGING=true
-        # Exception handling + helping
-	# 	in prod, make sure you remove these
-)
 add_compile_options("-DOPENFHE_VERSION=${OpenFHE_VERSION}")
 
 ### add each of the subdirs of src
