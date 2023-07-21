@@ -26,13 +26,6 @@ using namespace emscripten;
 #include "core/backend_em.h"
 #include "core/clear_context.h"
 
-CryptoContext<DCRTPoly> GenCryptoContextBFV2() {
-  CCParams<CryptoContextBFVRNS> parameters;
-  parameters.SetPlaintextModulus(65537);
-  parameters.SetMultiplicativeDepth(2);
-  return GenCryptoContext(parameters);
-}
-
 CryptoContext<DCRTPoly> GenCryptoContextBFV(CCParams<CryptoContextBFVRNS> params) {
   return GenCryptoContext(params);
 }
@@ -80,6 +73,22 @@ Plaintext MakePackedPlaintext(
   return cryptoCtx->MakePackedPlaintext(values, depth, level);
 }
 
+template<typename Element>
+Plaintext MakePackedPlaintextSingle(
+    const CryptoContext<Element> cryptoCtx,
+    std::vector<int64_t> values,
+    size_t depth = 1
+) {
+  return cryptoCtx->MakePackedPlaintext(values, depth, 0);
+}
+template<typename Element>
+Plaintext MakePackedPlaintextZero(
+    const CryptoContext<Element> cryptoCtx,
+    std::vector<int64_t> values
+) {
+  return cryptoCtx->MakePackedPlaintext(values, 1, 0);
+}
+
 /**
  * @brief Encrypt a plaintext using a given public key.
  * @param cryptoCtx - Reference to CryptoContext from JS.
@@ -89,9 +98,16 @@ Plaintext MakePackedPlaintext(
  * @return ciphertext (or null on failure)
  */
 template<typename Element>
-Ciphertext<Element> Encrypt(const CryptoContext<Element> cryptoCtx,
-                            const PublicKey<Element> publicKey,
-                            Plaintext plaintext) {
+Ciphertext<Element> EncryptPKPT(const CryptoContext<Element> cryptoCtx,
+                                const PublicKey<Element> publicKey,
+                                Plaintext plaintext) {
+  return cryptoCtx->Encrypt(publicKey, plaintext);
+}
+template<typename Element>
+Ciphertext<Element> EncryptPTPK(const CryptoContext<Element> cryptoCtx,
+                                Plaintext plaintext,
+                                const PublicKey<Element> publicKey
+) {
   return cryptoCtx->Encrypt(publicKey, plaintext);
 }
 
@@ -304,13 +320,25 @@ Ciphertext<Element> EvalMerge(const CryptoContext<Element> &cryptoCtx, emscripte
 //                                   emscripten::val ciphertexts,
 //                                   emscripten::val constants) {
 //  auto constArr = convertJSArrayToNumberVector<double>(constants);
-//  std::vector<Ciphertext<Element>> container;
-//  auto converted = vecFromJSArray<Ciphertext < Element > >(ciphertexts);
-//  for (auto &el: converted){
-//    container.emplace_back(*el);
+//  std::vector<Ciphertext<Element>> ciphertextVec = vecFromJSArray<Ciphertext<DCRTPoly>>(ciphertexts);
+//  std::vector<ConstCiphertext<Element>> constCiphertextVec = vecFromJSArray<ConstCiphertext<DCRTPoly>>(ciphertexts);
+//  return ciphertextVec[0];
+//  for (auto &el: ciphertextVec){
+//    auto derefed = *el;
+//    const ConstCiphertext<Element> consted = const derefed;
+//    container.emplace_back(consted);
 //  }
 //  return cryptoCtx->EvalLinearWSum(container, constArr);
 //}
+
+template<typename Element>
+Ciphertext<Element> EvalLinearWSum(const CryptoContext<Element> &cryptoCtx,
+                                   emscripten::val ciphertexts,
+                                   emscripten::val constants) {
+  std::vector<ConstCiphertext<Element>> constCiphertexts = vecFromJSArray<ConstCiphertext<Element>>(ciphertexts);
+  return cryptoCtx->EvalLinearWSum(constCiphertexts,
+                                   convertJSArrayToNumberVector<double>(constants));
+}
 
 /**
  * @brief this is a wrapper for the hoisted automorphism
@@ -719,10 +747,9 @@ using CC = CryptoContextImpl<DCRTPoly>;
 using CC_prime = CryptoContext<DCRTPoly>;
 EMSCRIPTEN_BINDINGS(CryproContext) {
 
-  emscripten::function("GenCryptoContextBFV2", &GenCryptoContextBFV2);
-  emscripten::function("GenCryptoContextBFV", select_overload<CC_prime(CCP_BFV)>(&GenCryptoContextBFV));
-  emscripten::function("GenCryptoContextCKKS", select_overload<CC_prime(CCP_CKKS)>(&GenCryptoContextCKKS));
-  emscripten::function("GenCryptoContextBGV", select_overload<CC_prime(CCP_BGV)>(&GenCryptoContextBGV));
+  emscripten::function("GenCryptoContextBFV", &GenCryptoContextBFV);
+  emscripten::function("GenCryptoContextCKKS", &GenCryptoContextCKKS);
+  emscripten::function("GenCryptoContextBGV", &GenCryptoContextBGV);
 
   emscripten::register_vector<Ciphertext<DCRTPoly >>("VectorCiphertextDCRTPoly");
   emscripten::register_vector<EvalKey<DCRTPoly>>("VectorEvalKeyDCRTPoly");
@@ -737,10 +764,8 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .constructor(&std::make_shared<CryptoContextImpl<DCRTPoly>>, allow_raw_pointers())
           // ignoring mult-feature Enable() for now
       .function("Enable", select_overload<void(PKESchemeFeature)>(&CC::Enable))
-      .function("Encrypt",
-                &Encrypt<DCRTPoly>)// select_overload<Ciphertext<DCRTPoly>(Plaintext, const PublicKey<DCRTPoly>)>(&CC::Encrypt))
+      .function("Encrypt", &EncryptPKPT<DCRTPoly>)
       .function("KeyGen", &CC::KeyGen)
-          // select_overload() required because the other overload is deprecated
       .function("MultipartyKeyGen", &MultipartyKeyGen<DCRTPoly>)
       .function("KeySwitchGen", &CC::KeySwitchGen)
       .function("MultiKeySwitchGen", &CC::MultiKeySwitchGen)
@@ -763,6 +788,8 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
           // 2 args
       .function("EvalAtIndexKeyGen", &EvalAtIndexKeyGen<DCRTPoly>)
       .function("MakePackedPlaintext", &MakePackedPlaintext<DCRTPoly>)
+      .function("MakePackedPlaintext", &MakePackedPlaintextSingle<DCRTPoly>)
+      .function("MakePackedPlaintext", &MakePackedPlaintextZero<DCRTPoly>)
       .function("MakeCKKSPackedPlaintext", &MakeCKKSPackedPlaintext<DCRTPoly>)
           // select_overload() required because the other overload is deprecated
       .function("ReEncrypt", &ReEncrypt2<DCRTPoly>)
@@ -780,7 +807,7 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .function("EvalInnerProduct", &EvalInnerProduct<DCRTPoly>)
       .function("EvalMultMany", &EvalMultMany<DCRTPoly>)
       .function("EvalMerge", &EvalMerge<DCRTPoly>)
-//    .function("EvalLinearWSum", &EvalLinearWSum<DCRTPoly>)
+      .function("EvalLinearWSum", &EvalLinearWSum<DCRTPoly>)
       .function("ModReduce", &ModReduce<DCRTPoly>)
       .function("EvalSumKeyGen", &EvalSumKeyGen1<DCRTPoly>)
       .function("GetEvalSumKeyMap", &GetEvalSumKeyMap<DCRTPoly>)
@@ -801,3 +828,6 @@ EMSCRIPTEN_BINDINGS(CryproContext) {
       .function("ReKeyGenPrivPub", &ReKeyGenWrapped<DCRTPoly>)
       .function("ReKeyGenPubPriv", &ReKeyGenWrappedTwo<DCRTPoly>);
 }
+
+// vector<shared_ptr<CiphertextImpl<lbcrypto::DCRTPolyImpl<bigintdyn::mubintvec<bigintdyn::ubint<unsigned int>>>>>>
+// vector<shared_ptr<const CiphertextImpl<lbcrypto::DCRTPolyImpl<bigintdyn::mubintvec<bigintdyn::ubint<unsigned int>>>>>> &

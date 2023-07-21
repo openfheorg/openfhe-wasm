@@ -1,0 +1,38 @@
+{
+  "name": "openfhe-crypto",
+  "version": "0.0.1",
+  "description": "JS bindings for openfhe Homomorphic Encryption Library",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "index.ts",
+    "lib"
+  ],
+  "directories": {
+    "doc": "doc",
+    "example": "examples",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "mocha ./unittest/*.mjs --recursive",
+    "build-ts-docs": "node doc/ts/generate-d-ts.mjs && typedoc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:openfheorg/OpenFHE-WASM.git"
+  },
+  "author": "",
+  "license": "BSD-3",
+  "bugs": {
+    "url": "https://github.com/openfheorg/OpenFHE-WASM/issues"
+  },
+  "homepage": "https://github.com/openfheorg/OpenFHE-WASM/blob/main/README.md",
+  "devDependencies": {
+    "mocha": "^8.4.0",
+    "typedoc": "^0.20.36"
+  },
+  "dependencies": {
+    "tsembind": "^1.0.2"
+  }
+}
+
