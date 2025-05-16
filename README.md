@@ -2,7 +2,7 @@
 
 `OpenFHE-WASM` is the official web-assembly port of the [OpenFHE library](https://github.com/openfheorg/openfhe-development). `OpenFHE-WASM` currently supports a subset of BGV, BFV, and CKKS API available in the OpenFHE C++ version.
 
-All versions of OpemFHE starting with v1.3.0 are supported.
+All versions of OpenFHE starting with v1.3.0 are supported.
 
 # Table of Contents
 - [Build instructions from source](#build-instructions-from-source)
