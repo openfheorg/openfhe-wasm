@@ -103,7 +103,7 @@ Now run the examples in the following directories using `nodejs`
 - [simple_integer.js](examples/js/pke/simple_integer.js): simple example showing homomorphic additions, multiplications, and rotations for vectors of integers using BFV
 - [simple_integer_bgvrns.js](examples/js/pke/simple_integer_bgvrns.js): simple example showing homomorphic additions, multiplications, and rotations for vectors of integers using BGV
 - [simple_integer_serialization.js](examples/js/pke/simple_integer_serialization.js): simple example with serialization showing homomorphic additions, multiplications, and rotations for vectors of integers using BFV
-- [simple_real_numbers.js](examples/js/pke/simple_real_numbers.js): simple example showing homomorphic additions, multiplications, and rotations for vectors of real numbers using CKKS
+- [simple_real_number.js](examples/js/pke/simple_real_number.js): simple example showing homomorphic additions, multiplications, and rotations for vectors of real numbers using CKKS
 - [threshold_fhe_bfv.js](examples/js/pke/threshold_fhe_bfv.js): example of threshold BFV
 
 # Notes specific to OpenFHE WebAssembly
