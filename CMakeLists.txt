@@ -16,6 +16,7 @@ include_directories(${OpenFHE_INCLUDE})
 include_directories(${OpenFHE_INCLUDE}/third-party/include)
 include_directories(${OpenFHE_INCLUDE}/core)
 include_directories(${OpenFHE_INCLUDE}/pke)
+include_directories(${OpenFHE_INCLUDE}/binfhe)
 link_directories(${OpenFHE_LIBDIR})
 link_libraries(${OpenFHE_LIBRARIES})
 

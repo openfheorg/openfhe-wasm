@@ -335,7 +335,7 @@ template<typename Element>
 Ciphertext<Element> EvalLinearWSum(const CryptoContext<Element> &cryptoCtx,
                                    emscripten::val ciphertexts,
                                    emscripten::val constants) {
-  std::vector<ConstCiphertext<Element>> constCiphertexts = vecFromJSArray<ConstCiphertext<Element>>(ciphertexts);
+  std::vector<ReadOnlyCiphertext<Element>> constCiphertexts = vecFromJSArray<ReadOnlyCiphertext<Element>>(ciphertexts);
   return cryptoCtx->EvalLinearWSum(constCiphertexts,
                                    convertJSArrayToNumberVector<double>(constants));
 }
