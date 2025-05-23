@@ -108,7 +108,7 @@ Now run the examples in the following directories using `nodejs`
 
 # Notes specific to OpenFHE WebAssembly
 
-* We have managed to compile `OpenFHE-WASM` using emscripten 3.1.30 through 4.0.8. A more recent version of `modejs` (20 or later) should be used to achieve the best performance.
+* We have managed to compile `OpenFHE-WASM` using emscripten 3.1.30 through 4.0.8. A more recent version of `nodejs` (20 or later) should be used to achieve the best performance.
 * The `OpenFHE-WASM` port is somewhat slower (typically 1.5 to 3.x depending on the operation) than the native C++ version of OpenFHE (in g++ or clang++) due to a normal slowdown incurred in web assembly builds (typically 2x) and additional slow-down due to the use of 64-bit arithmetic in PALISADE (64-bit arithmetic is emulated in WASM).
 * Web assembly running environment is typically limited to 4GB of RAM.
 * `OpenFHE-WASM` does not currently support multi-threading.
